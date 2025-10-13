@@ -22,9 +22,6 @@ const {AdminValidation} = require('../validations/index')
  *               - email
  *               - password
  *             properties:
- *               name:
- *                 type: string
- *                 example: John Admin
  *               email:
  *                 type: string
  *                 example: admin@example.com

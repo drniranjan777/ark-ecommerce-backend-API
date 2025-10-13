@@ -2,7 +2,7 @@
 const {Admin} = require('../services/index')
 const catchAsync = require('../utils/catchAsync')
 
-
+//admin resgister controller
 const registerAdmin = catchAsync(async (req, res) => {
   const admin = await Admin.adminRegister(req);
 
@@ -16,6 +16,8 @@ const registerAdmin = catchAsync(async (req, res) => {
   });
 });
 
+
+//admin login controller
 const loginAdmin = catchAsync(async (req, res) => {
   const admin = await Admin.loginAdmin(req);
 

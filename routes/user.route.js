@@ -179,11 +179,24 @@ router.delete('/:id', UserController.deleteUser);
  * @swagger
  * /api/user:
  *   get:
- *     summary: Get all users
+ *     summary: Get all users with pagination
  *     tags: [User]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of users per page
  *     responses:
  *       200:
- *         description: A list of users
+ *         description: A list of users with pagination info
  *         content:
  *           application/json:
  *             schema:
@@ -215,7 +228,20 @@ router.delete('/:id', UserController.deleteUser);
  *                       status:
  *                         type: string
  *                         enum: [active, block]
+ *                 total:
+ *                   type: integer
+ *                   example: 100
+ *                 page:
+ *                   type: integer
+ *                   example: 1
+ *                 limit:
+ *                   type: integer
+ *                   example: 10
+ *                 totalPages:
+ *                   type: integer
+ *                   example: 10
  */
+
 
 // Get all users
 router.get('/', UserController.getAllUsers);

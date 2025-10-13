@@ -6,6 +6,7 @@ const errorHandler = require("./middlewares/errorHandler");
 const routes = require('./routes/index')
 const cors = require('cors');
 const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 require("dotenv").config();
 require('./utils/swagger')(app); 
@@ -16,6 +17,7 @@ const PORT = process.env.PORT
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
+app.use(rateLimit({ windowMs: 10 * 60 * 1000, max: 50 }));
 app.use('/api', routes); 
 app.use(errorHandler)
 

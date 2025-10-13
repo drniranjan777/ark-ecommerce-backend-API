@@ -51,7 +51,7 @@ const deleteUser = catchAsync(async (req, res) => {
 
 // Get all users
 const getAllUsers = catchAsync(async (req, res) => {
-  const users = await UserService.getAllUsers();
+  const users = await UserService.getAllUsers(req);
 
   res.status(200).json({
     success: true,

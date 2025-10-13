@@ -47,6 +47,12 @@ const loginUser = async (req) => {
 
   const user = await findByEmail(email);
 
+  // console.log(user,'user..............')
+
+  if(user.status === 'block'){
+    throw new AppError('You are Blocked from admin',403)
+  }
+
   if (!user) {
     throw new AppError('Invalid email or password', 400);
   }
@@ -102,8 +108,26 @@ const deleteUser = async (req) => {
 };
 
 //get all users
-const getAllUsers = async () => {
-  return await User.find().select('-password'); // hide password
+const getAllUsers = async (req,limit=10) => {
+  const page = parseInt(req.query.page) || 1;
+  limit = parseInt(req.query.limit) || limit;
+
+  const skip = (page - 1) * limit;
+
+  const users = await User.find()
+    .select('-password')
+    .skip(skip)
+    .limit(limit);
+
+  const total = await User.countDocuments();
+
+  return {
+    users: users,
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+  };
 };
 
 module.exports = {
