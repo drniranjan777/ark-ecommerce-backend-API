@@ -1,4 +1,5 @@
 const Product = require('../models/product')
+const AppError = require('../utils/AppError')
 
 
 //create product
@@ -13,6 +14,10 @@ const createProduct = async(req) => {
 const getProductByid = async(req) => {
     const {productId} = req.params
     const product = await Product.findById(productId).lean()
+
+    if(!product){
+      throw new AppError("Product not found",404)
+    }
     return product
 }
 
@@ -26,6 +31,10 @@ const updateProduct = async(req) => {
         { $set:req.body},
         { new: true }
     );
+
+   if (!updatedProduct) {
+    throw new AppError('Product not updated or not found', 404);
+   }
     return updatedProduct
 }
 

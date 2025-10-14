@@ -44,7 +44,7 @@ const {ProductValidation,CommonValidate} = require('../validations/index')
 
 
 router.get('/:productId',
-   validate(CommonValidate.objectId('productId','params')),
+   validate(CommonValidate.objectId('productId'),'params'),
    ProductController.getProductById
 )
 
@@ -155,7 +155,7 @@ router.get('/:productId',
  *         description: Product not found
  */
 router.put('/:productId',
-   validate(CommonValidate.objectId('productId','params')),
+   validate(CommonValidate.objectId('productId'),'params'),
    validate(ProductValidation.productValidation),
    ProductController.updateProduct
 )
@@ -421,7 +421,7 @@ router.get('/',
 
 
 router.delete('/:productId',
-  validate(CommonValidate.objectId('productId','params')),
+  validate(CommonValidate.objectId('productId'),'params'),
   ProductController.deleteProduct
 )
 

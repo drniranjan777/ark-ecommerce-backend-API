@@ -2,16 +2,20 @@
 const Joi = require('joi');
 const mongoose = require('mongoose');
 
-const objectId = (name = 'id') =>
+const objectId = (field = 'id') =>
   Joi.object({
-    [name]: Joi.string()
+    [field]: Joi.string()
       .custom((value, helpers) => {
         if (!mongoose.Types.ObjectId.isValid(value)) {
           return helpers.error('any.invalid');
         }
         return value;
-      }, 'ObjectId Validation')
-      .required(),
+      }, 'ObjectId validation')
+      .required()
+      .messages({
+        'any.required': `${field} is required`,
+        'any.invalid': `${field} must be a valid ObjectId`,
+      }),
   });
 
 module.exports = {
