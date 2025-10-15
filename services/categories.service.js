@@ -42,6 +42,20 @@ const getCategorybyId = async(req) => {
 const updateCategory = async(req) => {
     const {categoryId} = req.params
 
+    const {category} = req.body
+
+    const categoryExists = await Category.findById(categoryId)
+
+    if(!categoryExists){
+      throw new AppError('Category not found',404)
+    }
+
+    const findCategory = await checkCategoryExists(category)
+
+    if(findCategory){
+      throw new AppError('Category already Exists',409)
+    }
+
     const updatedCategory = await Category.findByIdAndUpdate(
         categoryId,
         {$set:req.body},
@@ -49,7 +63,7 @@ const updateCategory = async(req) => {
     )
 
     if (!updatedCategory) {
-      throw new AppError('Product not updated or not found', 404);
+      throw new AppError('Product not updated', 500);
     }
     return updatedCategory
 }
@@ -59,6 +73,13 @@ const updateCategory = async(req) => {
 
 const deleteCategory = async(req) => {
     const {categoryId} = req.params
+
+    const categoryExistsOrNot = await Category.findById(categoryId)
+
+    if(categoryExistsOrNot){
+      throw new AppError('Category not Found',404)
+    }
+
     const deletedCategory = await Category.findByIdAndUpdate(
         categoryId,
         {$set:{isDeleted:true}},
@@ -75,7 +96,7 @@ const deleteCategory = async(req) => {
 //get all categories
 
 const getCategories = async() => {
-    const categories = await Category.find().lean()
+    const categories = await Category.find().sort({createdAt:-1}).lean()
     return categories
 }
 

@@ -8,11 +8,13 @@ const userRoutes = require('./user.route')
 const productRoutes = require('./products.route')
 const catgeoryRoutes = require('./categories.route')
 const uploadRoutes = require('./upload.route')
+const couponRoutes = require('./coupon.route')
 
 router.use('/admin', adminRoutes)
 router.use('/user', userRoutes)
 router.use('/products',productRoutes)
 router.use('/category',catgeoryRoutes)
 router.use('/upload',uploadRoutes)
+router.use('/coupon',couponRoutes)
 
 module.exports = router;

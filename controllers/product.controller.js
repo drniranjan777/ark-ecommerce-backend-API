@@ -53,11 +53,12 @@ const getProducts = catchAsync(async(req,res) => {
 //delete product
 
 const deleteProduct = catchAsync(async(req,res) => {
-    await ProductService.deleteProduct(req)
+    const result = await ProductService.deleteProduct(req)
 
     res.status(200).json({
         status:true,
-        message:'Product Deleted Successfull'
+        message:'Product Deleted Successfull',
+        data:result
     })
 })
 

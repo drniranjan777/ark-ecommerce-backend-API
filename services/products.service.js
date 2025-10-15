@@ -26,6 +26,7 @@ const getProductByid = async(req) => {
 
 const updateProduct = async(req) => {
     const {productId} = req.params
+
     const updatedProduct = await Product.findByIdAndUpdate(
         productId,
         { $set:req.body},
@@ -33,7 +34,7 @@ const updateProduct = async(req) => {
     );
 
    if (!updatedProduct) {
-    throw new AppError('Product not updated or not found', 404);
+    throw new AppError('Product not updated', 500);
    }
     return updatedProduct
 }
@@ -108,15 +109,20 @@ const getProducts = async (req) => {
 const deleteProduct = async(req) => {
   const {productId} = req.params
 
+  const productExists = await Product.findById(productId)
+
+  if(!productExists){
+    throw new AppError('Product not found',404)
+  }
 
   const product = await Product.findById(productId);
   if (!product) {
     throw new Error('Product not found');
   }
 
-  await Product.findByIdAndDelete(productId);
+   const deletedProduct = await Product.findByIdAndDelete(productId);
 
-  return true;
+  return deletedProduct;
 
 }
 
