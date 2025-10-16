@@ -75,16 +75,13 @@ const deleteCategory = async(req) => {
     const {categoryId} = req.params
 
     const categoryExistsOrNot = await Category.findById(categoryId)
+    console.log(categoryExistsOrNot,'categoryyyy')
 
-    if(categoryExistsOrNot){
+    if(!categoryExistsOrNot){
       throw new AppError('Category not Found',404)
     }
 
-    const deletedCategory = await Category.findByIdAndUpdate(
-        categoryId,
-        {$set:{isDeleted:true}},
-        {new:true}      
-    )
+    const deletedCategory = await Category.findByIdAndDelete(categoryId)
 
     if (!deletedCategory) {
         throw new AppError('Category not updated',404)
