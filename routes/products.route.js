@@ -4,7 +4,7 @@ const router = express.Router()
 const {ProductController} = require('../controllers/index')
 const validate = require('../middlewares/validate')
 const {ProductValidation,CommonValidate} = require('../validations/index')
-
+const userAuth = require("../middlewares/userAuth")
 
 
 /**
@@ -424,5 +424,235 @@ router.delete('/:productId',
   validate(CommonValidate.objectId('productId'),'params'),
   ProductController.deleteProduct
 )
+
+/**
+ * @swagger
+ * /api/products/review:
+ *   post:
+ *     summary: Submit a review for a product
+ *     tags:
+ *       - Products
+ *     description: Allows a user to submit a product review with rating and comment.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ProductReviewInput'
+ *           example:
+ *             product: "652d1af7a118f0b6f0c3a7c9"
+ *             rating: 5
+ *             review: "Amazing quality and delivery speed!"
+ *     responses:
+ *       201:
+ *         description: Review created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ProductReview'
+ *       400:
+ *         description: Bad request – validation error
+ *       500:
+ *         description: Internal server error
+ */
+
+
+
+router.post('/review',
+   userAuth,
+   validate(ProductValidation.productReviewValidation),
+   ProductController.createProductReview
+)
+
+/**
+ * @swagger
+ * /api/products/review/{reviewId}:
+ *   get:
+ *     summary: Get a specific product review by ID
+ *     tags:
+ *       - Products
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: reviewId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           minLength: 24
+ *           maxLength: 24
+ *         description: The ID of the review to retrieve
+ *     responses:
+ *       200:
+ *         description: Review retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ProductReview'
+ *       400:
+ *         description: Invalid review ID
+ *       401:
+ *         description: Unauthorized – JWT token missing or invalid
+ *       404:
+ *         description: Review not found
+ *       500:
+ *         description: Internal server error
+ */
+
+
+router.get('/review/:reviewId',
+   userAuth,
+   validate(CommonValidate.objectId('reviewId'),'params'),
+   ProductController.getProductReviewById
+)
+
+/**
+ * @swagger
+ * /api/products/review/{reviewId}:
+ *   put:
+ *     summary: Update an existing product review
+ *     tags:
+ *       - Products
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: reviewId
+ *         required: true
+ *         description: ID of the review to update
+ *         schema:
+ *           type: string
+ *           example: 652d1af7a118f0b6f0c3a7c9
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ProductReviewInput'
+ *           example:
+ *             product: 652d1af7a118f0b6f0c3a7a1
+ *             rating: 4
+ *             review: "Updated review text goes here"
+ *     responses:
+ *       200:
+ *         description: Review updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ProductReview'
+ *       400:
+ *         description: Bad request – invalid input
+ *       401:
+ *         description: Unauthorized – user not logged in
+ *       403:
+ *         description: Forbidden – user not owner of review
+ *       404:
+ *         description: Review not found
+ *       500:
+ *         description: Internal server error
+ */
+
+
+router.put('/review/:reviewId',
+   userAuth,
+   validate(CommonValidate.objectId('reviewId'),'params'),
+   validate(ProductValidation.productReviewValidation),
+   ProductController.updateProductReview
+)
+
+/**
+ * @swagger
+ * /api/products/review/{reviewId}:
+ *   delete:
+ *     summary: Delete a product review
+ *     tags:
+ *       - Products
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: reviewId
+ *         required: true
+ *         description: The ID of the review to delete
+ *         schema:
+ *           type: string
+ *           example: 652d1af7a118f0b6f0c3a7c9
+ *     responses:
+ *       200:
+ *         description: Review deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Review deleted successfull
+ *       400:
+ *         description: Invalid review ID
+ *       401:
+ *         description: Unauthorized — user not logged in
+ *       403:
+ *         description: Forbidden — user does not own the review
+ *       404:
+ *         description: Review not found
+ *       500:
+ *         description: Internal server error
+ */
+
+
+router.delete('/review/:reviewId',
+   userAuth,
+   validate(CommonValidate.objectId('reviewId'),'params'),
+   validate(ProductValidation.productReviewValidation),
+   ProductController.deleteProductReview
+)
+
+
+/**
+ * @swagger
+ * /api/products/review/product/{reviewId}:
+ *   get:
+ *     summary: Get all reviews for a specific product
+ *     tags:
+ *       - Products
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: reviewId
+ *         required: true
+ *         description: The ID of the product to fetch reviews for
+ *         schema:
+ *           type: string
+ *           example: 652d1af7a118f0b6f0c3a7c9
+ *     responses:
+ *       200:
+ *         description: List of product reviews retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 reviews:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/ProductReview'
+ *       400:
+ *         description: Invalid product ID
+ *       401:
+ *         description: Unauthorized — user not logged in
+ *       404:
+ *         description: No reviews found for this product
+ *       500:
+ *         description: Internal server error
+ */
+
+
+router.get('/review/product/:reviewId',
+   validate(CommonValidate.objectId('reviewId'),'params'),
+   ProductController.getProductReviews
+)
+
 
 module.exports = router

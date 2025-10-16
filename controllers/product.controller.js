@@ -62,10 +62,72 @@ const deleteProduct = catchAsync(async(req,res) => {
     })
 })
 
+//create product review
+
+const createProductReview = catchAsync(async(req,res) => {
+    const result = await ProductService.createProductReview(req)
+     res.status(201).json({
+        status:true,
+        message:'Review Created Successfull',
+        data:result
+    })
+})
+
+
+//create get product review by id
+
+const getProductReviewById = catchAsync(async(req,res) => {
+    const result = await ProductService.getProductReviewById(req)
+     res.status(200).json({
+        status:true,
+        message:'Review Fetched Successfull',
+        data:result
+    })
+})
+
+//uppdate review
+
+const updateProductReview = catchAsync(async(req,res) => {
+    const result = await ProductService.updateProductReview(req)
+     res.status(200).json({
+        status:true,
+        message:'Review Updated Successfull',
+        data:result
+    })
+})
+
+//delete review
+
+const deleteProductReview = catchAsync(async(req,res) => {
+    const result = await ProductService.deleteProductReview(req)
+     res.status(200).json({
+        status:true,
+        message:'Review Deleted Successfull',
+        data:result
+    })
+})
+
+//get product reviews
+
+const getProductReviews = catchAsync(async(req,res) => {
+    const result = await ProductService.getProductReviews(req)
+     res.status(200).json({
+        status:true,
+        message:'Reviews Fetched Successfull',
+        data:result
+    })
+})
+
 module.exports = {
     createProduct,
     getProductById,
     updateProduct,
     getProducts,
-    deleteProduct
+    deleteProduct,
+
+    createProductReview,
+    getProductReviewById,
+    updateProductReview,
+    deleteProductReview,
+    getProductReviews
 }

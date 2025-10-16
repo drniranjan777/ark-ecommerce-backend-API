@@ -1,7 +1,6 @@
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 
-
 const options = {
   definition: {
     openapi: '3.0.0',
@@ -12,10 +11,30 @@ const options = {
     },
     servers: [
       {
-        url:process.env.SWAGGER_URL,
+        url: process.env.SWAGGER_URL || 'http://localhost:8080',
+      },
+    ],
+
+    // ✅ Global security scheme (Authorize button appears)
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT', // Optional: just for UI hints
+        },
+      },
+    },
+
+    // ✅ Apply bearerAuth globally to all routes
+    security: [
+      {
+        bearerAuth: [],
       },
     ],
   },
+
+  // 👇 Path to your JSDoc comments
   apis: ['./routes/*.js'],
 };
 

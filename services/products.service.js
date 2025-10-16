@@ -1,5 +1,6 @@
 const Product = require('../models/product')
 const AppError = require('../utils/AppError')
+const ProductReview = require('../models/productReview')
 
 
 //create product
@@ -126,10 +127,111 @@ const deleteProduct = async(req) => {
 
 }
 
+//create product review
+
+const createProductReview = async(req) => {
+   const user = req.user
+   const { product, rating, review } = req.body;
+   const createdReview = await ProductReview.create({
+     product,
+     user:user.id,
+     review,
+     rating
+   })
+   console.log(user,'userrrrrr')
+   return createdReview
+}
+
+//get review by id
+
+const getProductReviewById = async(req) => {
+  const {reviewId }= req.params
+
+  const review = await ProductReview.findById(reviewId)
+
+  if(!review){
+    throw new AppError('Review not found',404)
+  }
+
+  return review
+}
+
+//upate product review
+
+const updateProductReview = async(req) =>{
+   const {reviewId} = await req.params
+   const user = req.user
+
+    const review = await getProductReviewById(req)
+
+
+    if (review.user.toString() !== user.id.toString()) {
+      throw new AppError('Different user created this review you are not able to update',409)
+    }
+  
+   const updatedReview = await ProductReview.findByIdAndUpdate(
+     reviewId,
+     {$set : req.body},
+     {new:true}
+   )
+
+   if(!updatedReview){
+    throw new AppError('Review not updated',500)
+   }
+   return updatedReview
+ 
+} 
+
+
+//delete product review
+
+const deleteProductReview = async(req) =>{
+   const {reviewId} = await req.params
+   const user = req.user
+
+    const review = await getProductReviewById(req)
+
+    if (review.user.toString() !== user.id.toString()) {
+      throw new AppError('Different user created this review you are not able to delete',409)
+    }
+  
+   const deletedReview = await ProductReview.findByIdAndDelete(reviewId)
+
+   if(!deletedReview){
+    throw AppError('Review not deleted',500)
+   }
+
+   return deletedReview
+ 
+} 
+
+//get product reviews
+
+const getProductReviews = async(req) => {
+   const {reviewId} = req.params
+
+  //  console.log(productId,'pppppp')
+
+   const productReviews = await ProductReview.find({product:reviewId})
+
+   if(!productReviews){
+     throw new AppError('Internal server error',500)
+   }
+
+   return productReviews
+
+}
+
 module.exports = {
     createProduct,
     getProductByid,
     updateProduct,
     getProducts,
-    deleteProduct
+    deleteProduct,
+
+    createProductReview,
+    getProductReviewById,
+    updateProductReview,
+    deleteProductReview,
+    getProductReviews
 }

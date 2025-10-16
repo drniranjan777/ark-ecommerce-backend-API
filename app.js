@@ -38,6 +38,10 @@ const globalLimiter = rateLimit({
 
 app.use(globalLimiter);
 
+app.get('/',(_,res) => {
+  return res.send({message:"Api is Live"})
+})
+
 //handle routes
 app.use('/api', routes); 
 
