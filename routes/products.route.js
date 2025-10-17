@@ -197,9 +197,6 @@ router.put('/:productId',
  *               sku:
  *                 type: string
  *                 example: SKU123456
- *               thumbnail:
- *                 type: string
- *                 example: https://cdn.example.com/images/thumb.jpg
  *               previews:
  *                 type: array
  *                 items:

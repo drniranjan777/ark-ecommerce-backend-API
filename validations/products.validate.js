@@ -4,7 +4,7 @@ const productValidation = Joi.object({
   name: Joi.string().required().min(1).max(255),
   description: Joi.string().required().min(1).max(1000),
   sku: Joi.string().required().min(1).max(100),
-  thumbnail: Joi.string().uri().required(),
+  // thumbnail: Joi.string().uri().required(),
   previews: Joi.array().items(Joi.string().uri()).required().min(1),
   price: Joi.number().required().min(0),
   tax: Joi.number().required().min(0),
