@@ -12,6 +12,7 @@ const path = require('path');
 
 require("dotenv").config();
 require('./utils/swagger')(app); 
+app.disable('x-powered-by');
 
 const PORT = process.env.PORT
 
