@@ -11,6 +11,7 @@ const uploadRoutes = require('./upload.route')
 const couponRoutes = require('./coupon.route')
 const cartRoutes = require('./cart.route')
 const wishlistRoutes = require('./wishlist.route')
+const homePageBannerRoutes = require('./homepageBanner.route')
 
 router.use('/admin', adminRoutes)
 router.use('/user', userRoutes)
@@ -20,5 +21,6 @@ router.use('/upload',uploadRoutes)
 router.use('/coupon',couponRoutes)
 router.use('/cart',cartRoutes)
 router.use('/wishlist',wishlistRoutes)
+router.use('/homepagebanner',homePageBannerRoutes)
 
 module.exports = router;
