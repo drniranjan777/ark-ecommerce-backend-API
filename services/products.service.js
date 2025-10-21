@@ -212,7 +212,7 @@ const getProductReviews = async(req) => {
 
   //  console.log(productId,'pppppp')
 
-   const productReviews = await ProductReview.find({product:reviewId})
+   const productReviews = await ProductReview.find({product:reviewId}).populate('user','-password')
 
    if(!productReviews){
      throw new AppError('Internal server error',500)
