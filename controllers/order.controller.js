@@ -5,7 +5,7 @@ const catchAsync = require('../utils/catchAsync')
 const createOrder = catchAsync(async(req,res) => {
    const result = await OrderService.createOrder(req)
 
-   return res.status(202).json({
+   return res.status(201).json({
     status:true,
     message:'Order Created',
     data:result
@@ -38,16 +38,40 @@ const getAllOrders = catchAsync(async(req,res) => {
 const updateOrder = catchAsync(async(req,res) => {
    const result = await OrderService.updateOrder(req)
 
-   return res.status(202).json({
+   return res.status(200).json({
     status:true,
     message:'Order updated successfull',
     data:result
    })
 })
 
+//update order
+const orderAnalytics = catchAsync(async(req,res) => {
+   const result = await OrderService.orderAnalytics(req)
+
+   return res.status(200).json({
+    status:true,
+    message:'Order fethched successfull',
+    data:result
+   })
+})
+
+//order details
+const orderDetails = catchAsync(async(req,res) => {
+   const result = await OrderService.orderDetails(req)
+
+   return res.status(200).json({
+    status:true,
+    message:'Order details fethched successfull',
+    data:result
+   })
+})
 module.exports = {
     createOrder,
     getUserOrders,
     getAllOrders,
-    updateOrder
+    updateOrder,
+    
+    orderAnalytics,
+    orderDetails
 }

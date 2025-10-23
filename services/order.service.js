@@ -83,14 +83,24 @@ const getAllOrders = async(req) => {
    const limit = Number(req.query.limit || 10)
    const skip = (page - 1)*limit
 
-   const orders = await Order.find().skip(skip).limit(limit).lean()
+    const { name, status } = req.query;
 
-   const finalOrderswithProducts = await Promise.all(
-     orders.map(async(order) => {
-        const products = await getProducts(order.items)
-        return products
-     })
-   )
+
+    const filter = {};
+    if (name) filter.name = { $regex: name, $options: 'i' };
+    if (status) filter.status = status;
+
+    const orders = await Order.find(filter).skip(skip).limit(limit).lean()
+
+    const finalOrderswithProducts = await Promise.all(
+        orders.map(async(order) => {
+            const products = await getProducts(order.items)
+            return {
+                products,
+                address:order.address
+            }
+        })
+    )
 
    return finalOrderswithProducts
 }
@@ -114,9 +124,38 @@ const updateOrder = async(req) => {
     return updatedOrder
 }
 
+
+// order analytics
+const orderAnalytics = async(req,res) => {
+  const orders = await Order.find()
+
+  if(!orders) throw new AppError('Orders not fetched',500)
+
+
+  const totalPrice = orders.reduce((acc,item) => {return acc+item.totalPrice},0)
+
+  const totalOrders = await Order.countDocuments()
+  const pendingOrders = await Order.find({status:'pending'}).countDocuments()
+  const confirmedOrders = await Order.find({status:'confirmed'}).countDocuments()
+}
+
+const orderDetails = async(req) => {
+    const {orderId} = req.params
+    
+    const orderDetails = await Order.findById(orderId)
+
+    const products =  await getProducts(orderDetails.items)
+
+    return products
+}
+
+ 
 module.exports = {
     createOrder,
     getUserOrders,
     getAllOrders,
-    updateOrder
+    updateOrder,
+
+    orderAnalytics,
+    orderDetails
 }

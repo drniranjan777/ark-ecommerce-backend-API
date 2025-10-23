@@ -281,4 +281,158 @@ router.get(
     OrderController.getAllOrders
 )
 
+/**
+ * @swagger
+ * /api/order/analytics:
+ *   get:
+ *     summary: Get order analytics and statistics
+ *     description: Retrieve summary analytics for all orders such as total count, total revenue, and status breakdown.
+ *     tags:
+ *       - Orders
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         required: false
+ *         description: Filter analytics starting from this date (YYYY-MM-DD)
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         required: false
+ *         description: Filter analytics up to this date (YYYY-MM-DD)
+ *     responses:
+ *       200:
+ *         description: Order analytics retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalOrders:
+ *                   type: integer
+ *                   example: 1250
+ *                   description: Total number of orders
+ *                 totalRevenue:
+ *                   type: number
+ *                   format: float
+ *                   example: 254830.75
+ *                   description: Total revenue from all orders
+ *                 ordersByStatus:
+ *                   type: object
+ *                   example:
+ *                     pending: 120
+ *                     completed: 980
+ *                     cancelled: 150
+ *                     refunded: 10
+ *                   description: Breakdown of orders by their status
+ *          
+ *       400:
+ *         description: Invalid date format or bad request
+ *       500:
+ *         description: Internal server error
+ */
+
+router.get(
+    '/analytics',
+    OrderController.orderAnalytics
+)
+
+/**
+ * @swagger
+ * /api/order/{orderId}:
+ *   get:
+ *     summary: Get detailed information about a specific order
+ *     description: Retrieve complete order details by order ID, including products, user info, and status.
+ *     tags:
+ *       - Orders
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: orderId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: 64fa72b12c5a9b3d5e1a9c2e
+ *         description: The unique ID of the order to retrieve
+ *     responses:
+ *       200:
+ *         description: Order details retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                   example: 64fa72b12c5a9b3d5e1a9c2e
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: 64f86b9e0b4e8a23ac7a112c
+ *                     name:
+ *                       type: string
+ *                       example: John Doe
+ *                     email:
+ *                       type: string
+ *                       example: john@example.com
+ *                 status:
+ *                   type: string
+ *                   example: confirmed
+ *                 amount:
+ *                   type: number
+ *                   example: 2499.99
+ *                 paymentMethod:
+ *                   type: string
+ *                   example: UPI
+ *                 address:
+ *                   type: object
+ *                   properties:
+ *                     street:
+ *                       type: string
+ *                       example: 123 MG Road
+ *                     city:
+ *                       type: string
+ *                       example: Bangalore
+ *                     pincode:
+ *                       type: string
+ *                       example: 560001
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       productId:
+ *                         type: string
+ *                         example: 64f973db2a77d43cf51eae11
+ *                       name:
+ *                         type: string
+ *                         example: iPhone 15 Pro
+ *                       quantity:
+ *                         type: integer
+ *                         example: 2
+ *                       price:
+ *                         type: number
+ *                         example: 1249.99
+ *       400:
+ *         description: Invalid order ID format
+ *       404:
+ *         description: Order not found
+ *       500:
+ *         description: Internal server error
+ */
+
+router.get(
+    '/:orderId',
+    OrderController.orderDetails
+)
+
 module.exports = router
