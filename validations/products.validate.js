@@ -51,7 +51,18 @@ const productReviewValidation = Joi.object({
     })
 });
 
+const productSize = Joi.object({
+  size: Joi.string()
+    .required()
+    .messages({
+      'string.base': 'Product ID must be a string',
+      'string.length': 'Invalid product ID',
+      'any.required': 'Product ID is required'
+    }),
+});
+
 module.exports = {
   productValidation,
-  productReviewValidation
+  productReviewValidation,
+  productSize
 };

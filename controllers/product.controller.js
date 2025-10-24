@@ -118,6 +118,62 @@ const getProductReviews = catchAsync(async(req,res) => {
     })
 })
 
+/*
+  product sizes
+*/
+
+//create productsize
+
+const createProductSize = catchAsync(async(req,res) => {
+    const result = await ProductService.createProductSize(req)
+     res.status(201).json({
+        status:true,
+        message:'Product size created successfull',
+        data:result
+    })
+})
+
+//get product size by id
+const getProductSizeById = catchAsync(async(req,res) => {
+    const result = await ProductService.getProductSizeById(req)
+     res.status(200).json({
+        status:true,
+        message:'Product size fetched successfull',
+        data:result
+    })
+})
+
+//get all product sizes
+
+const getAllProductSizes = catchAsync(async(req,res) => {
+    const result = await ProductService.getAllProductsSizes(req)
+     res.status(200).json({
+        status:true,
+        message:'Product size fetched successfull',
+        data:result
+    })
+})
+
+//update product size
+const updateProductSize = catchAsync(async(req,res) => {
+    const result = await ProductService.updateProductSize(req)
+     res.status(200).json({
+        status:true,
+        message:'Product size updated successfull',
+        data:result
+    })
+})
+
+//delete produxt size
+const deleteProductSize = catchAsync(async(req,res) => {
+    const result = await ProductService.deleteProductSize(req)
+     res.status(200).json({
+        status:true,
+        message:'Product size updated successfull',
+        data:result
+    })
+})
+
 module.exports = {
     createProduct,
     getProductById,
@@ -129,5 +185,11 @@ module.exports = {
     getProductReviewById,
     updateProductReview,
     deleteProductReview,
-    getProductReviews
+    getProductReviews,
+
+    createProductSize,
+    getProductSizeById,
+    getAllProductSizes,
+    updateProductSize,
+    deleteProductSize
 }

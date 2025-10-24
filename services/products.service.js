@@ -1,6 +1,7 @@
 const Product = require('../models/product')
 const AppError = require('../utils/AppError')
 const ProductReview = require('../models/productReview')
+const ProductSize = require('../models/productSize')
 
 
 //create product
@@ -222,6 +223,74 @@ const getProductReviews = async(req) => {
 
 }
 
+/* 
+  product size section
+*/
+
+//check product size exists or not
+const checkSizeExistsOrNot = async(productSize) => {
+  const size = await ProductSize.findOne({size:{$regex:`^${productSize}$`,$options:'i'}})
+  
+  if(size) throw new AppError('Product size already exists')
+  return size
+}
+
+//created product size
+const createProductSize = async(req) => {
+   const {size} = req.body
+
+   await checkSizeExistsOrNot(size) 
+
+   const createdSize = await ProductSize.create({size})
+
+   return createdSize
+
+}
+
+//get product size
+
+const getProductSizeById = async(req) => {
+    const {sizeId} = req.params
+
+    const productSize = await ProductSize.findById(sizeId)
+
+    if(!productSize) throw new AppError('Product size not found',404)
+
+    return productSize
+}
+
+//get all product size
+
+const getAllProductsSizes = async() => {
+  const productSizes = await ProductSize.find().lean()
+  return productSizes
+}
+
+//update product size
+
+const updateProductSize = async(req) => {
+  const {sizeId} = req.params
+  const {size} = req.body
+
+  await checkSizeExistsOrNot(size)
+
+  const updatedSize = await ProductSize.findByIdAndUpdate(
+    sizeId,
+    {$set:{size:size}},
+    {new:true}
+  )
+
+  return updatedSize
+}
+
+//delete product size
+const deleteProductSize = async(req) => {
+  const {sizeId} = req.params
+  
+  const deletedSize = await ProductSize.findByIdAndDelete(sizeId)
+  return deletedSize
+}
+
 module.exports = {
     createProduct,
     getProductByid,
@@ -233,5 +302,12 @@ module.exports = {
     getProductReviewById,
     updateProductReview,
     deleteProductReview,
-    getProductReviews
+    getProductReviews,
+
+    //product size
+    createProductSize,
+    getProductSizeById,
+    getAllProductsSizes,
+    updateProductSize,
+    deleteProductSize
 }

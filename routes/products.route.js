@@ -427,8 +427,8 @@ router.delete('/:productId',
  * /api/products/review:
  *   post:
  *     summary: Submit a review for a product
- *     tags:
- *       - Products
+ *     tags: 
+ *       - Products review
  *     description: Allows a user to submit a product review with rating and comment.
  *     requestBody:
  *       required: true
@@ -467,7 +467,7 @@ router.post('/review',
  *   get:
  *     summary: Get a specific product review by ID
  *     tags:
- *       - Products
+ *       - Products review
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -509,7 +509,7 @@ router.get('/review/:reviewId',
  *   put:
  *     summary: Update an existing product review
  *     tags:
- *       - Products
+ *       - Products review
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -563,7 +563,7 @@ router.put('/review/:reviewId',
  *   delete:
  *     summary: Delete a product review
  *     tags:
- *       - Products
+ *       - Products review
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -612,7 +612,7 @@ router.delete('/review/:reviewId',
  *   get:
  *     summary: Get all reviews for a specific product
  *     tags:
- *       - Products
+ *       - Products review
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -650,6 +650,295 @@ router.get('/review/product/:reviewId',
    validate(CommonValidate.objectId('reviewId'),'params'),
    ProductController.getProductReviews
 )
+
+/**
+ * @swagger
+ * /api/products/size/product:
+ *   get:
+ *     summary: Get all product sizes
+ *     description: Retrieves a list of all available product sizes.
+ *     tags:
+ *       - Products size
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of all product sizes retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Product sizes fetched successfully
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         example: "6700b8ef2f1b7b0012a345cd"
+ *                       size:
+ *                         type: string
+ *                         example: "Medium"
+ *       401:
+ *         description: Unauthorized (missing or invalid token)
+ *       500:
+ *         description: Internal server error
+ */
+
+
+router.get('/size/product',
+   ProductController.getAllProductSizes
+)
+
+
+/**
+ * @swagger
+ * /api/products/size:
+ *   post:
+ *     summary: Create a new product size
+ *     description: Adds a new product size (e.g., Small, Medium, Large)
+ *     tags:
+ *       - Products size
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - size
+ *             properties:
+ *               size:
+ *                 type: string
+ *                 description: The size label for the product
+ *                 example: "Medium"
+ *     responses:
+ *       201:
+ *         description: Product size created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Product size added successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: "6700b8ef2f1b7b0012a345cd"
+ *                     size:
+ *                       type: string
+ *                       example: "Medium"
+ *       400:
+ *         description: Invalid request data
+ *       401:
+ *         description: Unauthorized (missing or invalid token)
+ *       500:
+ *         description: Internal server error
+ */
+
+
+router.post('/size',
+
+   // validate(CommonValidate.objectId('reviewId'),'params'),
+   validate(ProductValidation.productSize),
+   ProductController.createProductSize
+)
+
+
+
+/**
+ * @swagger
+ * /api/products/size/{sizeId}:
+ *   get:
+ *     summary: Get product size by ID
+ *     description: Retrieves details of a specific product size using its unique ID.
+ *     tags:
+ *       - Products size
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: sizeId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The unique ID of the product size to retrieve
+ *         example: "6700b8ef2f1b7b0012a345cd"
+ *     responses:
+ *       200:
+ *         description: Product size fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Product size fetched successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: "6700b8ef2f1b7b0012a345cd"
+ *                     size:
+ *                       type: string
+ *                       example: "Medium"
+ *       400:
+ *         description: Invalid size ID
+ *       401:
+ *         description: Unauthorized (missing or invalid token)
+ *       404:
+ *         description: Product size not found
+ *       500:
+ *         description: Internal server error
+ */
+
+
+router.get('/size/:sizeId',
+   validate(CommonValidate.objectId('sizeId'),'params'),
+   ProductController.getProductSizeById
+)
+
+/**
+ * @swagger
+ * /api/products/size/{sizeId}:
+ *   put:
+ *     summary: Update product size by ID
+ *     description: Updates the size value of an existing product size using its unique ID.
+ *     tags:
+ *       - Products size
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: sizeId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The unique ID of the product size to update
+ *         example: "6700b8ef2f1b7b0012a345cd"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - size
+ *             properties:
+ *               size:
+ *                 type: string
+ *                 description: The new size name to update
+ *                 example: "Large"
+ *     responses:
+ *       200:
+ *         description: Product size updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Product size updated successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: "6700b8ef2f1b7b0012a345cd"
+ *                     size:
+ *                       type: string
+ *                       example: "Large"
+ *       400:
+ *         description: Invalid request data or size ID
+ *       401:
+ *         description: Unauthorized (missing or invalid token)
+ *       404:
+ *         description: Product size not found
+ *       500:
+ *         description: Internal server error
+ */
+
+
+router.put('/size/:sizeId',
+   validate(CommonValidate.objectId('sizeId'),'params'),
+   validate(ProductValidation.productSize),
+   ProductController.updateProductSize
+)
+
+/**
+ * @swagger
+ * /api/products/size/{sizeId}:
+ *   delete:
+ *     summary: Delete product size by ID
+ *     description: Deletes a specific product size using its unique ID.
+ *     tags:
+ *       - Products size
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: sizeId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The unique ID of the product size to delete
+ *         example: "6700b8ef2f1b7b0012a345cd"
+ *     responses:
+ *       200:
+ *         description: Product size deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Product size deleted successfully
+ *       400:
+ *         description: Invalid size ID
+ *       401:
+ *         description: Unauthorized (missing or invalid token)
+ *       404:
+ *         description: Product size not found
+ *       500:
+ *         description: Internal server error
+ */
+
+
+router.delete('/size/:sizeId',
+   validate(CommonValidate.objectId),
+   ProductController.deleteProductSize
+)
+
+
 
 
 module.exports = router
