@@ -61,10 +61,22 @@ const deleteCoupon = CatchAsync(async(req,res) => {
     })
 })
 
+//apply coupon
+const applyCoupon = CatchAsync(async(req,res) => {
+    const result = await CouponService.applyCoupon(req)
+
+    res.status(200).json({
+        status:true,
+        message:'Coupon applied Successfully',
+        data:result
+    })
+})
+
 module.exports = {
     createCoupon,
     getCouponbyId,
     updateCoupon,
     getCoupons,
-    deleteCoupon
+    deleteCoupon,
+    applyCoupon
 }

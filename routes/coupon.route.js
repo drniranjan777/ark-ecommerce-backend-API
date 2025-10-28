@@ -326,4 +326,79 @@ router.delete('/:couponId',
  CouponController.deleteCoupon
 )
 
+/**
+ * @swagger
+ * /api/coupon/apply:
+ *   post:
+ *     summary: Apply a coupon to calculate the discounted total
+ *     description: Validates and applies a coupon code based on total cart value.
+ *     tags: [Coupon]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - total
+ *               - couponCode
+ *             properties:
+ *               total:
+ *                 type: number
+ *                 example: 1500
+ *               couponCode:
+ *                 type: string
+ *                 example: SAVE100
+ *     responses:
+ *       200:
+ *         description: Coupon applied successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Coupon applied successfully
+ *                 couponCode:
+ *                   type: string
+ *                   example: SAVE100
+ *                 discount:
+ *                   type: number
+ *                   example: 100
+ *                 totalBeforeDiscount:
+ *                   type: number
+ *                   example: 1500
+ *                 totalAfterDiscount:
+ *                   type: number
+ *                   example: 1400
+ *       400:
+ *         description: Invalid coupon or minimum purchase not met
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Minimum purchase of ₹1000 required
+ *       404:
+ *         description: Coupon not found or inactive
+ *       500:
+ *         description: Internal server error
+ */
+
+
+router.post('/apply',
+//  validate(CommonValidate.objectId('couponId'),'params'),
+validate(CouponValidation.applyCoupon),
+ CouponController.applyCoupon
+)
+
 module.exports = router

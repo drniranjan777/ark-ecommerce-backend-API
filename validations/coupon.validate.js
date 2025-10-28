@@ -5,4 +5,9 @@ const validateCoupon = Joi.object({
   discount: Joi.number().required().min(1).max(100)
 });
 
-module.exports = {validateCoupon};
+const applyCoupon = Joi.object({
+  couponCode: Joi.string().required().min(1).max(255),
+  total: Joi.number().required().min(1)
+});
+
+module.exports = {validateCoupon,applyCoupon};

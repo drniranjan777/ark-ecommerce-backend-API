@@ -29,7 +29,7 @@ const getProducts = async(orderItems) => {
 const createOrder = async(req) => {
     const user =  req.user
 
-    const {items} = req.body
+    // const {items} = req.body
 
     const cart = await Cart.findOne({userId:user.id})
 
@@ -74,7 +74,10 @@ const getUserOrders = async(req) => {
 
    const products = await getProducts(userOrders.items)
 
-   return products
+   return {
+    products,
+    orderDetails:userOrders
+}
 }
 
 //get all orders

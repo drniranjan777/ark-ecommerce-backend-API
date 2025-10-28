@@ -30,7 +30,43 @@ const loginAdmin = catchAsync(async (req, res) => {
 });
 
 
+//admin update controller
+const updateAdminStatus = catchAsync(async (req, res) => {
+  const admin = await Admin.updateAdminStatus(req);
+
+  res.status(200).json({
+    success: true,
+    message: 'Status updated successfully',
+    data: admin
+  });
+});
+
+//admin delete controller
+const deleteAdmin = catchAsync(async (req, res) => {
+  const admin = await Admin.deleteAdmin(req);
+
+  res.status(200).json({
+    success: true,
+    message: 'Admin deleted successfully',
+    data: admin
+  });
+});
+
+//get admin controller
+const getAdmins = catchAsync(async (req, res) => {
+  const admin = await Admin.getAllAdmins(req);
+
+  res.status(200).json({
+    success: true,
+    message: 'Admin fetched successfully',
+    data: admin
+  });
+});
+
 module.exports = {
     registerAdmin,
-    loginAdmin
+    loginAdmin,
+    updateAdminStatus,
+    deleteAdmin,
+    getAdmins
 }

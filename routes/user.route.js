@@ -104,7 +104,7 @@ router.post('/register',
  */
 
 router.post('/login',
-    validate(AdminValidation.adminRegister),
+    validate(UserValidation.userLogin),
     UserController.loginUser
 )
 

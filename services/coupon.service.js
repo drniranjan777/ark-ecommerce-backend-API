@@ -2,6 +2,7 @@
 const Coupon = require("../models/coupon")
 const AppError = require("../utils/AppError")
 
+
 //check coupon exists are not
 
 const checkCoupon = async(couponCode) => {
@@ -9,6 +10,8 @@ const checkCoupon = async(couponCode) => {
     if(coupon){
         throw new AppError('Coupon Already Exists',409)
     }
+
+    return 
 }
 
 //create coupon service
@@ -104,11 +107,31 @@ const deleteCoupon = async(req) => {
   return deletedCoupon
 }
 
+//apply coupon
+
+const applyCoupon = async(req) => {
+  const {total,couponCode} = req.body
+
+  const coupon = await Coupon.findOne({coupon:couponCode})
+
+  if(!coupon) throw new AppError('Invalid coupon',404)
+
+  const discount = (total * coupon.discount) / 100;
+
+  const finalTotal = Math.max(total - discount, 0);
+
+  return {
+    discount,
+    finalTotal,
+    couponCode
+  }
+}
 
 module.exports = {
     createCoupon,
     getCouponbyId,
     updateCoupon,
     getCoupons,
-    deleteCoupon
+    deleteCoupon,
+    applyCoupon
 }
