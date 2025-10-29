@@ -14,6 +14,7 @@ const wishlistRoutes = require('./wishlist.route')
 const homePageBannerRoutes = require('./homepageBanner.route')
 const orderRoutes = require('./order.route')
 const brandRoutes = require('./brand.route')
+const aboutRoutes = require('./about.route')
 
 router.use('/admin', adminRoutes)
 router.use('/user', userRoutes)
@@ -26,5 +27,6 @@ router.use('/wishlist',wishlistRoutes)
 router.use('/homepagebanner',homePageBannerRoutes)
 router.use('/order',orderRoutes)
 router.use('/brand',brandRoutes)
+router.use('/about',aboutRoutes)
 
 module.exports = router;

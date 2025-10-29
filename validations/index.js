@@ -10,5 +10,6 @@ module.exports.WishlistValidation = require('./wishlist.validate')
 module.exports.HomepageBannerValidation = require('./homepageBanner.validate')
 module.exports.OrderValidation = require('./order.validate')
 module.exports.BrandValidation = require('./brand.validate')
+module.exports.AboutValidation = require('./about.validate')
 
 module.exports.CommonValidate = require('./global.validate')
