@@ -10,6 +10,7 @@ const productValidation = Joi.object({
   tax: Joi.number().required().min(0),
   stocklevel: Joi.number().integer().required().min(0),
   category: Joi.string().required().min(1).max(255),
+  brand: Joi.string().required().min(1).max(255),
   size: Joi.number().required().min(0),
   color: Joi.string().required().min(1).max(100),
   packsize: Joi.number().integer().required().min(1),

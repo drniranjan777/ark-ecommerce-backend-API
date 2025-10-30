@@ -47,6 +47,7 @@ const getProducts = async (req) => {
   const {
     search,
     category,
+    brand,
     color,
     size,
     minPrice,
@@ -68,6 +69,7 @@ const getProducts = async (req) => {
   }
 
   if (category) filter.category = category;
+  if (brand) filter.brand = brand;
   if (color) filter.color = color;
   if (size) filter.size = Number(size);
   if (minPrice || maxPrice) {

@@ -278,6 +278,11 @@ router.post('/',
  *           type: string
  *         description: "Filter by product category"
  *       - in: query
+ *         name: brand
+ *         schema:
+ *           type: string
+ *         description: "Filter by product brand"
+ *       - in: query
  *         name: color
  *         schema:
  *           type: string
