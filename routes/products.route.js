@@ -216,6 +216,9 @@ router.put('/:productId',
  *               category:
  *                 type: string
  *                 example: Accessories
+ *               brand:
+ *                 type: string
+ *                 exmaple: Nike
  *               size:
  *                 type: number
  *                 example: 42
