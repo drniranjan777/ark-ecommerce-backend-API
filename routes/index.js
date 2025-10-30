@@ -15,6 +15,7 @@ const homePageBannerRoutes = require('./homepageBanner.route')
 const orderRoutes = require('./order.route')
 const brandRoutes = require('./brand.route')
 const aboutRoutes = require('./about.route')
+const termsAndConditonsRoutes = require('./termsandconditons.route')
 
 router.use('/admin', adminRoutes)
 router.use('/user', userRoutes)
@@ -28,5 +29,6 @@ router.use('/homepagebanner',homePageBannerRoutes)
 router.use('/order',orderRoutes)
 router.use('/brand',brandRoutes)
 router.use('/about',aboutRoutes)
+router.use('/terms',termsAndConditonsRoutes)
 
 module.exports = router;
