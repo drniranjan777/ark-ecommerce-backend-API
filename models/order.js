@@ -24,12 +24,12 @@ const orderSchema = new mongoose.Schema({
     country: { type: String, required: true },
     phone: { type: String, required: true }
   },
-  items: [
-    {
-      productId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: Product },
-      quantity: { type: Number, required: true },
-    }
-  ],
+  // items: [
+  //   {
+  //     productId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: Product },
+  //     quantity: { type: Number, required: true },
+  //   }
+  // ],
   status: {
     type: String,
     enum: ['pending','confirmed','shipped','delivered','cancelled'],

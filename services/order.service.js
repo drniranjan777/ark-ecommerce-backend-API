@@ -2,6 +2,7 @@ const Order = require('../models/order')
 const Product = require('../models/product')
 const AppError = require('../utils/AppError')
 const {Cart,CartItem} = require('../models/cart')
+const OrderItem = require('../models/orderitem')
 
 //get products
 const getProducts = async(orderItems) => {
@@ -35,7 +36,7 @@ const createOrder = async(req) => {
 
     if(!cart) throw new AppError('Cart not found',404)
 
-    const cartItems = await CartItem.find({cartId:cart._id})
+    const cartItems = await CartItem.find({cartId:cart._id}).populate('productId')
 
     if(!cartItems) throw new AppError('Cart items not found',404)
 
@@ -53,31 +54,67 @@ const createOrder = async(req) => {
     const newOrder = await Order.create({
         userId:user.id,
         totalPrice:products.totalPrice,
-        items:orderItems,
+        // items:orderItems,
         ...req.body,
     })
 
+
+    const createOrderItem =  await Promise.all(
+        cartItems.map((item) => {
+          return OrderItem.create({
+            orderId: newOrder.orderId,
+            productId: item.productId,
+            quantity: item.quantity,
+            unitPrice: item.productId.price * item.quantity,
+            // totalPrice: item.price * item.quantity,
+          })
+        })
+    )
+
     if(!newOrder) throw new AppError('Order not created',500)
     
-    await CartItem.deleteMany({cartId:cart._id})
+    // await CartItem.deleteMany({cartId:cart._id})
 
-    return newOrder
+    return {newOrder,createOrderItem}
 }
 
 //get user orders
 const getUserOrders = async(req) => {
    const user = req.user
 
-   const userOrders = await Order.findOne({userId:user.id})
+   const userOrders = await Order.find({userId:user.id})
 
    if(!userOrders) throw new AppError('Orders not found',404)
 
-   const products = await getProducts(userOrders.items)
+//    const products = await getProducts(userOrders.items)
 
-   return {
-    products,
-    orderDetails:userOrders
-}
+//    const orderedProducts = await Promise.all(
+//      userOrders.map((item) => {
+//        return {
+//         products : OrderItem.find({orderId:item.orderId}).populate('productId'),
+//         address : Order.findOne({orderId:item.orderId})
+//     }
+//      })
+//    )
+
+   const orderedProducts = await Promise.all(
+    userOrders.map(async (order) => {
+      const items = await OrderItem.find({ orderId: order.orderId })
+        .populate("productId");
+
+      return {
+        orderId: order.orderId,
+        address: order.address,
+        totalPrice: order.totalPrice,
+        status: order.status,
+        products: items
+      };
+    })
+  );
+
+
+
+   return orderedProducts
 }
 
 //get all orders
@@ -95,29 +132,44 @@ const getAllOrders = async(req) => {
 
     const orders = await Order.find(filter).skip(skip).limit(limit).lean()
 
-    const finalOrderswithProducts = await Promise.all(
-        orders.map(async(order) => {
-            const products = await getProducts(order.items)
-            return {
-                products,
-                address:order.address
-            }
-        })
-    )
+    // const finalOrderswithProducts = await Promise.all(
+    //     orders.map(async(order) => {
+    //         const products = await getProducts(order.items)
+    //         return {
+    //             products,
+    //             address:order.address
+    //         }
+    //     })
+    // )
 
-   return finalOrderswithProducts
+    const orderedProducts = await Promise.all(
+        orders.map(async (order) => {
+        const items = await OrderItem.find({ orderId: order.orderId })
+            .populate("productId");
+
+        return {
+            orderId: order.orderId,
+            address: order.address,
+            totalPrice: order.totalPrice,
+            status: order.status,
+            products: items
+        };
+        })
+    );
+
+   return orderedProducts
 }
 
 //update order
 const updateOrder = async(req) => {
     const {orderId} = req.params
     
-    const checkOrder = await Order.findById(orderId)
+    const checkOrder = await Order.findOne({orderId:orderId})
 
     if(!checkOrder) throw new AppError('Order not found',404)
 
-    const updatedOrder = await Order.findByIdAndUpdate(
-        orderId,
+    const updatedOrder = await Order.updateOne(
+        {orderId:orderId},
         {$set:req.body},
         {new:true}
     )
@@ -145,11 +197,11 @@ const orderAnalytics = async(req,res) => {
 const orderDetails = async(req) => {
     const {orderId} = req.params
     
-    const orderDetails = await Order.findById(orderId)
+    const orderDetails = await OrderItem.find({orderId:orderId}).populate('productId')
 
-    const products =  await getProducts(orderDetails.items)
+    // const products =  await getProducts(orderDetails.items)
 
-    return products
+    return orderDetails
 }
 
  
