@@ -73,7 +73,7 @@ const createOrder = async(req) => {
 
     if(!newOrder) throw new AppError('Order not created',500)
     
-    // await CartItem.deleteMany({cartId:cart._id})
+    await CartItem.deleteMany({cartId:cart._id})
 
     return {newOrder,createOrderItem}
 }
