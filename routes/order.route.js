@@ -435,4 +435,176 @@ router.get(
     OrderController.orderDetails
 )
 
+/**
+ * @swagger
+ * /api/order/orderitem:
+ *   put:
+ *     summary: Update the status of a specific order item
+ *     description: Update the status of an order item using orderId and productId.
+ *     tags:
+ *       - Order Items
+ *     security:
+ *       - bearerAuth: []    # requires authentication (e.g., JWT)
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - orderId
+ *               - productId
+ *               - status
+ *             properties:
+ *               orderId:
+ *                 type: string
+ *                 example: "671fcb8c7d9e0a123456789a"
+ *                 description: Unique ID of the order.
+ *               productId:
+ *                 type: string
+ *                 example: "671fcb8c7d9e0a987654321b"
+ *                 description: Unique ID of the product within the order.
+ *               status:
+ *                 type: string
+ *                 enum: [pending, shipped, delivered, cancelled]
+ *                 example: "shipped"
+ *                 description: New status for the order item.
+ *     responses:
+ *       200:
+ *         description: Order item status updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Order item status updated successfully
+ *                 data:
+ *                   type: object
+ *                   example:
+ *                     success: true
+ *       400:
+ *         description: Bad Request (missing or invalid fields)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Invalid status value
+ *       404:
+ *         description: Order item not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Order item not found
+ */
+
+router.put(
+    '/orderitem',
+    validate(OrderValidation.updateOrderItemStatus),
+    OrderController.updateOrderItemStatus
+)
+
+/**
+ * @swagger
+ * /api/order/refund:
+ *   put:
+ *     summary: Update the refund of a specific order item
+ *     description: Update the status of an order item using orderId and productId.
+ *     tags:
+ *       - Order Items
+ *     security:
+ *       - bearerAuth: []    # requires authentication (e.g., JWT)
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - orderId
+ *               - productId
+ *               - status
+ *             properties:
+ *               orderId:
+ *                 type: string
+ *                 example: "671fcb8c7d9e0a123456789a"
+ *                 description: Unique ID of the order.
+ *               productId:
+ *                 type: string
+ *                 example: "671fcb8c7d9e0a987654321b"
+ *                 description: Unique ID of the product within the order.
+ *               refundStatus:
+ *                 type: string
+ *                 enum: [none,initiated,completed,failed]
+ *                 example: "initiated"
+ *                 description: New status for the order item.
+ *     responses:
+ *       200:
+ *         description: Order item status updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Order item status updated successfully
+ *                 data:
+ *                   type: object
+ *                   example:
+ *                     success: true
+ *       400:
+ *         description: Bad Request (missing or invalid fields)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Invalid status value
+ *       404:
+ *         description: Order item not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Order item not found
+ */
+
+router.put(
+    '/refund',
+    validate(OrderValidation.updateRefundStatus),
+    OrderController.updateRefundStatus
+)
+
 module.exports = router

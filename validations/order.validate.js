@@ -38,6 +38,20 @@ const orderValidation = Joi.object({
     .required()
 });
 
+const updateOrderItemStatus = Joi.object({
+  orderId : Joi.string().required(),
+  productId : Joi.string().required(),
+  status : Joi.string().required()
+})
+
+const updateRefundStatus = Joi.object({
+  orderId : Joi.string().required(),
+  productId : Joi.string().required(),
+  refundStatus : Joi.string().required()
+})
+
 module.exports = {
-    orderValidation
+    orderValidation,
+    updateOrderItemStatus,
+    updateRefundStatus
 }

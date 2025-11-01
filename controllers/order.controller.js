@@ -66,6 +66,31 @@ const orderDetails = catchAsync(async(req,res) => {
     data:result
    })
 })
+
+//update order item
+
+const updateOrderItemStatus = catchAsync(async(req,res) => {
+   const result = await OrderService.updateOrderItemStatus(req)
+
+   return res.status(200).json({
+    status:true,
+    message:'Order item detail updated successfull',
+    data:result
+   })
+})
+
+//update refund status
+
+const updateRefundStatus = catchAsync(async(req,res) => {
+   const result = await OrderService.updateRefundStatus(req)
+
+   return res.status(200).json({
+    status:true,
+    message:'Refund status updated successfull',
+    data:result
+   })
+})
+
 module.exports = {
     createOrder,
     getUserOrders,
@@ -73,5 +98,8 @@ module.exports = {
     updateOrder,
     
     orderAnalytics,
-    orderDetails
+    orderDetails,
+
+    updateOrderItemStatus,
+    updateRefundStatus
 }

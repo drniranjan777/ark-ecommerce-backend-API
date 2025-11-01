@@ -105,6 +105,7 @@ const getUserOrders = async(req) => {
       return {
         orderId: order.orderId,
         address: order.address,
+        paymentStatus:order.paymentStatus,
         createdAt: order.createdAt,
         totalPrice: order.totalPrice,
         status: order.status,
@@ -206,10 +207,42 @@ const orderDetails = async(req) => {
     return orderDetails
 }
 
-//update order Item
+//update order Item status
+
+const updateOrderItemStatus = async(req) => {
+   const {orderId,productId,status} = req.body
+
+   const result = await OrderItem.updateOne(
+    {orderId,productId},
+    {$set:{status:status}},
+    {new:true,runValidators: true}
+   )
 
 
+   if (result.matchedCount === 0) throw new AppError("Product not found", 404);
+   if (result.modifiedCount === 0) throw new AppError("No changes made", 400);
+
+   return result
+}
  
+//update refund status
+
+const updateRefundStatus = async(req) => {
+    const {orderId,productId,refundStatus} = req.body
+
+   
+    const result = await OrderItem.updateOne(
+        {orderId,productId},
+        {$set:{refundStatus:refundStatus}},
+        {new:true,runValidators: true}
+    )
+
+    if (result.matchedCount === 0) throw new AppError("Product not found", 404);
+    if (result.modifiedCount === 0) throw new AppError("No changes made", 400);
+
+   return result
+}
+
 module.exports = {
     createOrder,
     getUserOrders,
@@ -217,5 +250,8 @@ module.exports = {
     updateOrder,
 
     orderAnalytics,
-    orderDetails
+    orderDetails,
+
+    updateOrderItemStatus,
+    updateRefundStatus
 }
