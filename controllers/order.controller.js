@@ -74,7 +74,7 @@ const updateOrderItemStatus = catchAsync(async(req,res) => {
 
    return res.status(200).json({
     status:true,
-    message:'Order item detail updated successfull',
+    message:'Order item status updated successfull',
     data:result
    })
 })
@@ -91,6 +91,18 @@ const updateRefundStatus = catchAsync(async(req,res) => {
    })
 })
 
+//update refund status
+
+const getOrderedStatusItems = catchAsync(async(req,res) => {
+   const result = await OrderService.getOrderProductsByStatus(req)
+
+   return res.status(200).json({
+    status:true,
+    message:'Items fetched successfull',
+    data:result
+   })
+})
+
 module.exports = {
     createOrder,
     getUserOrders,
@@ -101,5 +113,6 @@ module.exports = {
     orderDetails,
 
     updateOrderItemStatus,
-    updateRefundStatus
+    updateRefundStatus,
+    getOrderedStatusItems
 }

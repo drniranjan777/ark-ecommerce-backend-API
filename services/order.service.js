@@ -114,8 +114,6 @@ const getUserOrders = async(req) => {
     })
   );
 
-
-
    return orderedProducts
 }
 
@@ -243,6 +241,13 @@ const updateRefundStatus = async(req) => {
    return result
 }
 
+//get cancelled products
+const getOrderProductsByStatus = async(req) => {
+    const {status} = req.body
+    const items = await OrderItem.find({status:status}).populate('productId')
+    return items
+}
+
 module.exports = {
     createOrder,
     getUserOrders,
@@ -253,5 +258,6 @@ module.exports = {
     orderDetails,
 
     updateOrderItemStatus,
-    updateRefundStatus
+    updateRefundStatus,
+    getOrderProductsByStatus
 }

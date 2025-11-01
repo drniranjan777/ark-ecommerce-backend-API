@@ -607,4 +607,85 @@ router.put(
     OrderController.updateRefundStatus
 )
 
+/**
+ * @swagger
+ * /api/order/orderitems:
+ *   post:
+ *     summary: Get all order items by status
+ *     description: Retrieve a list of order items filtered by their current status. Status is provided in the request body.
+ *     tags:
+ *       - Order Items
+ *     security:
+ *       - bearerAuth: []   # If JWT authentication is used
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - status
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [pending, shipped, delivered, cancelled]
+ *                 example: shipped
+ *                 description: The status of the order items to retrieve.
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved order items by status
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Order items fetched successfully
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       orderId:
+ *                         type: string
+ *                         example: "6724d3dfd89f1b3e4a7b2341"
+ *                       productId:
+ *                         type: string
+ *                         example: "6724d3dfd89f1b3e4a7b2359"
+ *                       status:
+ *                         type: string
+ *                         example: "shipped"
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2025-10-31T10:21:00.000Z"
+ *                       updatedAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2025-11-01T08:30:00.000Z"
+ *       400:
+ *         description: Invalid or missing status in request body
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "status is required"
+ */
+
+router.post(
+    '/orderitems',
+    validate(OrderValidation.orderStatus),
+    OrderController.getOrderedStatusItems
+)
+
 module.exports = router
