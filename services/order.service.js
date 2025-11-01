@@ -105,6 +105,7 @@ const getUserOrders = async(req) => {
       return {
         orderId: order.orderId,
         address: order.address,
+        createdAt: order.createdAt,
         totalPrice: order.totalPrice,
         status: order.status,
         products: items
@@ -194,6 +195,7 @@ const orderAnalytics = async(req,res) => {
   const confirmedOrders = await Order.find({status:'confirmed'}).countDocuments()
 }
 
+//order details
 const orderDetails = async(req) => {
     const {orderId} = req.params
     
@@ -203,6 +205,9 @@ const orderDetails = async(req) => {
 
     return orderDetails
 }
+
+//update order Item
+
 
  
 module.exports = {
