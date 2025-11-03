@@ -16,6 +16,7 @@ const orderRoutes = require('./order.route')
 const brandRoutes = require('./brand.route')
 const aboutRoutes = require('./about.route')
 const termsAndConditonsRoutes = require('./termsandconditons.route')
+const blogRoutes = require('./blog.route')
 
 router.use('/admin', adminRoutes)
 router.use('/user', userRoutes)
@@ -30,5 +31,6 @@ router.use('/order',orderRoutes)
 router.use('/brand',brandRoutes)
 router.use('/about',aboutRoutes)
 router.use('/terms',termsAndConditonsRoutes)
+router.use('/blog',blogRoutes)
 
 module.exports = router;
