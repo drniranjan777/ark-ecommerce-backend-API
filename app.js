@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+require("dotenv").config();
 const connectDB = require("./config/db");
 const errorHandler = require("./middlewares/errorHandler");
 // const AppError = require("./utils/AppError");
@@ -10,7 +11,6 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 
 
-require("dotenv").config();
 require('./utils/swagger')(app); 
 app.disable('x-powered-by');
 

@@ -2,6 +2,8 @@ const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const AppError = require('../utils/AppError');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto')
+const transporter = require('../config/mailer')
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 const JWT_EXPIRES_IN = '1d';
@@ -130,10 +132,72 @@ const getAllUsers = async (req,limit=10) => {
   };
 };
 
+//forget password
+
+const forgotPasswordService = async (req) => {
+  const {email,resetLink} = req.body
+  const user = await User.findOne({ email })
+
+
+  if (!user) throw new AppError("User not found",404)
+
+  // Generate token
+  const token = crypto.randomBytes(32).toString("hex")
+
+  // Set token + expiry (1 hour)
+  user.resetPasswordToken = token
+  user.resetPasswordExpires = Date.now() + 3600000
+  await user.save();
+
+  // Send email
+  const link = `${resetLink}?token=${token}`
+
+  const mailOptions = {
+    from: `"My App" <${process.env.SMTP_USER}>`,
+    to: user.email,
+    subject: "Reset Your Password",
+    html: `
+      <p>You requested a password reset.</p>
+      <p>Click below to reset your password:</p>
+      <a href="${link}">${link}</a>
+      <p>This link expires in 1 hour.</p>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions)
+
+  return 
+};
+
+//reset password
+const resetPasswordService = async (req) => {
+
+  const {token,newPassword} = req.body
+
+  const user = await User.findOne({
+    resetPasswordToken: token,
+    resetPasswordExpires: { $gt: Date.now() },
+  });
+
+  if (!user) throw new AppError("Invalid or expired token")
+
+  // Hash new password
+  const hashedPassword = await bcrypt.hash(newPassword, 10)
+  user.password = hashedPassword
+  user.resetPasswordToken = undefined
+  user.resetPasswordExpires = undefined
+
+  await user.save()
+  return
+};
+
 module.exports = {
   userRegister,
   loginUser,
   updateUser,
   deleteUser,
-  getAllUsers
+  getAllUsers,
+
+  forgotPasswordService,
+  resetPasswordService
 };

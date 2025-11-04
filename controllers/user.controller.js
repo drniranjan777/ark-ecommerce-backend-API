@@ -60,10 +60,35 @@ const getAllUsers = catchAsync(async (req, res) => {
   });
 });
 
+// forget password
+const forgetPassword = catchAsync(async (req, res) => {
+  const users = await UserService.forgotPasswordService(req);
+
+  res.status(200).json({
+    success: true,
+    message: 'Password reset link sent to email',
+    data: users,
+  });
+})
+
+// reset password
+const resetPassword = catchAsync(async (req, res) => {
+  const result = await UserService.resetPasswordService(req);
+
+  res.status(200).json({
+    success: true,
+    message: 'Reset password successfull',
+    data: result,
+  });
+})
+
 module.exports = {
   registerUser,
   loginUser,
   updateUser,
   deleteUser,
-  getAllUsers
+  getAllUsers,
+
+  forgetPassword,
+  resetPassword
 };
