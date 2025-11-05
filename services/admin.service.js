@@ -2,6 +2,8 @@ const Admin = require('../models/admin');
 const bcrypt = require('bcrypt');
 const AppError = require('../utils/AppError');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto')
+const transporter = require('../config/mailer')
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 const JWT_EXPIRES_IN = '1d';
@@ -125,10 +127,71 @@ const getAllAdmins = async(req) => {
   }
 }
 
+
+//forget password
+
+const forgetPassword = async(req) => {
+  const {email,resetLink} = req.body
+
+  const admin = await Admin.findOne({email})
+  
+  if(!admin) throw new AppError('Admin not found',404)
+
+  const token = crypto.randomBytes(32).toString("hex")
+  
+  admin.resetPasswordToken = token
+  admin.resetPasswordExpires = Date.now() + 3600000
+  await admin.save()
+
+  // Send email
+  const link = `${resetLink}?token=${token}`
+
+  const mailOptions = {
+    from: `"My App" <${process.env.SMTP_USER}>`,
+    to: user.email,
+    subject: "Reset Your Password",
+    html: `
+      <p>You requested a password reset.</p>
+      <p>Click below to reset your password:</p>
+      <a href="${link}">${link}</a>
+      <p>This link expires in 1 hour.</p>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions)
+
+  return 
+
+}
+
+//reset password
+const resetPassword = async() => {
+  const {newPassword,token} = req.body
+
+  const admin = await Admin.findOne({
+    resetPasswordToken:token,
+    resetPasswordExpires:{$gt:Date.now()}
+  })
+
+  if(!admin) throw new AppError('Invalid or expire token',409)
+
+  admin.password = await bcrypt.hash(newPassword,10)
+  admin.resetPasswordToken = undefined
+  admin.resetPasswordExpires = undefined
+
+  await admin.save()
+
+  return
+}
+
+
 module.exports = {
   adminRegister,
   loginAdmin,
   updateAdminStatus,
   deleteAdmin,
-  getAllAdmins
+  getAllAdmins,
+
+  forgetPassword,
+  resetPassword
 };
