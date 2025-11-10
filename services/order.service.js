@@ -30,11 +30,42 @@ const getProducts = async(orderItems) => {
 const createOrder = async(req) => {
     const user =  req.user
 
-    // const {items} = req.body
+    const orderSource = req.query.buyNow === "true"
 
-    const cart = await Cart.findOne({userId:user.id})
+    let cart = await Cart.findOne({userId:user.id})
 
-    if(!cart) throw new AppError('Cart not found',404)
+    if(!cart) 
+
+        cart = await Cart.create({userId:user.id})
+
+
+    if(orderSource === true) {
+
+        if(!(req.session.buyNow.quantity || req.session.buyNow.quantity)) throw new AppError('No item found',409)
+
+        const productSession= req.session.buyNow
+        const buyNowProduct = await Product.findById(productSession.productId)
+
+        const newOrder = await Order.create({
+            userId:user.id,
+            totalPrice:buyNowProduct.price*productSession.quantity,
+            // items:orderItems,
+            ...req.body,
+        })
+
+         
+        const createdOrderItem = await OrderItem.create({
+            orderId: newOrder.orderId,
+            productId: productSession.productId,
+            quantity: productSession.quantity,
+            unitPrice: buyNowProduct.price * productSession.quantity,
+            // totalPrice: item.price * item.quantity,
+        })
+
+        req.session.buyNow = null
+        return {createdOrderItem,newOrder}
+
+    }
 
     const cartItems = await CartItem.find({cartId:cart._id}).populate('productId')
 
@@ -59,6 +90,7 @@ const createOrder = async(req) => {
     })
 
 
+
     const createOrderItem =  await Promise.all(
         cartItems.map((item) => {
           return OrderItem.create({
@@ -73,10 +105,12 @@ const createOrder = async(req) => {
 
     if(!newOrder) throw new AppError('Order not created',500)
     
-    await CartItem.deleteMany({cartId:cart._id})
+    if(!orderSource) await CartItem.deleteMany({cartId:cart._id})
 
     return {newOrder,createOrderItem}
 }
+
+
 
 //get user orders
 const getUserOrders = async(req) => {
@@ -248,6 +282,21 @@ const getOrderProductsByStatus = async(req) => {
     return items
 }
 
+//buy now service 
+
+const buyNowFunction = async(req) => {
+    // console.log
+    // console.log(req.session.buyNow,'jljjjjljllj')
+    const {productId,quantity} = req.body
+    req.session.buyNow = {
+        productId: productId,
+        quantity: quantity
+    }
+    
+    req.session.save()
+    return
+}
+
 module.exports = {
     createOrder,
     getUserOrders,
@@ -259,5 +308,7 @@ module.exports = {
 
     updateOrderItemStatus,
     updateRefundStatus,
-    getOrderProductsByStatus
+    getOrderProductsByStatus,
+
+    buyNowFunction
 }

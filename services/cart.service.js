@@ -122,9 +122,9 @@ const clearCart = async(req) => {
 const getUserCartItems = async(req) => { 
    const user = req.user
 
-   const cart = await Cart.findOne({userId:user.id})
+   let cart = await Cart.findOne({userId:user.id})
 
-   if(!cart) throw new AppError('Cart not found',404)
+   if(!cart) cart = await Cart.create({userId:user.id})    
 
    const cartItems = await CartItem.find({cartId:cart._id}).populate('productId').lean()
 

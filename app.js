@@ -9,6 +9,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
 
 
 require('./utils/swagger')(app); 
@@ -39,6 +41,26 @@ const globalLimiter = rateLimit({
 
 app.use(globalLimiter);
 
+// Session setup
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI,
+      collectionName: 'sessions',
+      ttl: 60 * 15, // 15 minutes
+      autoRemove: 'native',
+    }),
+    cookie: {
+      maxAge: 1000 * 60 * 15, // 15 min
+      secure: false, // true if using HTTPS
+      httpOnly: true, // prevents JS access to cookie
+    },
+  })
+);
+
 app.get('/',(_,res) => {
   return res.send({message:"Api is Live"})
 })
@@ -61,3 +83,5 @@ connectDB()
     console.error("❌ MongoDB connection failed:", err);
     process.exit(1); 
 });
+
+

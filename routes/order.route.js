@@ -14,6 +14,13 @@ const userAuth = require('../middlewares/userAuth')
  *       - Orders
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: buyNow
+ *         schema:
+ *           type: boolean
+ *         required: false
+ *         description: Set to true if the order is for Buy Now functionality
  *     requestBody:
  *       required: true
  *       content:
@@ -86,6 +93,7 @@ const userAuth = require('../middlewares/userAuth')
  *       500:
  *         description: Internal server error
  */
+
 
 router.post(
     '/create',
@@ -686,6 +694,77 @@ router.post(
     '/orderitems',
     validate(OrderValidation.orderStatus),
     OrderController.getOrderedStatusItems
+)
+
+/**
+ * @swagger
+ * /api/order/buy-now:
+ *   post:
+ *     summary: Buy Now - Add a single product to session for checkout
+ *     description: >
+ *       Store a single product (productId and quantity) into the user's session for the "Buy Now" flow.
+ *       This product will be used temporarily for checkout without affecting the real cart.
+ *       Works similar to Amazon's Buy Now button.
+ *     tags:
+ *       - Order buy now
+ *     security:
+ *       - bearerAuth: []   # Optional - include only if JWT auth is used
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - productId
+ *               - quantity
+ *             properties:
+ *               productId:
+ *                 type: string
+ *                 description: ID of the product to buy
+ *                 example: "6757a8f2b12345abc6789012"
+ *               quantity:
+ *                 type: integer
+ *                 description: Quantity of the product
+ *                 example: 1
+ *     responses:
+ *       200:
+ *         description: Product successfully stored in session for Buy Now
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Buy Now product added to session"
+ *                 product:
+ *                   type: object
+ *                   properties:
+ *                     productId:
+ *                       type: string
+ *                       example: "6757a8f2b12345abc6789012"
+ *                     name:
+ *                       type: string
+ *                       example: "Wireless Mouse"
+ *                     price:
+ *                       type: number
+ *                       example: 999
+ *                     quantity:
+ *                       type: integer
+ *                       example: 1
+ *       400:
+ *         description: Invalid product ID or missing fields
+ *       404:
+ *         description: Product not found
+ *       500:
+ *         description: Internal server error
+ */
+
+
+router.post(
+    '/buy-now',
+    OrderController.buyNow
 )
 
 module.exports = router

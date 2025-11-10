@@ -103,6 +103,18 @@ const getOrderedStatusItems = catchAsync(async(req,res) => {
    })
 })
 
+//By now controller
+
+const buyNow = catchAsync(async(req,res) => {
+   const result = await OrderService.buyNowFunction(req)
+
+   return res.status(200).json({
+    status:true,
+    message:'Item stored in cache sucessfull',
+    data:result
+   })
+})
+
 module.exports = {
     createOrder,
     getUserOrders,
@@ -114,5 +126,7 @@ module.exports = {
 
     updateOrderItemStatus,
     updateRefundStatus,
-    getOrderedStatusItems
+    getOrderedStatusItems,
+
+    buyNow
 }
