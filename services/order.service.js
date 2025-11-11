@@ -12,16 +12,15 @@ const getProducts = async(orderItems) => {
 
     let totalPrice = 0
 
-    // console.log(orderItems,products,'orderrrrrrrrrr')
-
     products.forEach((product) => {
         orderItems.forEach(orderItem => {
-            if(orderItem.productId.toString() === product._id.toString()){
+            if(orderItem.productId._id.toString() === product._id.toString()){
                 totalPrice = totalPrice + (orderItem.quantity*product.price)
             }
         })
     })
 
+    // console.log(totalPrice,'totla calll')
 
     return {products,totalPrice}
 }
@@ -34,17 +33,19 @@ const createOrder = async(req) => {
 
     let cart = await Cart.findOne({userId:user.id})
 
-    if(!cart) 
-
-        cart = await Cart.create({userId:user.id})
+    if(!cart) cart = await Cart.create({userId:user.id})
 
 
-    if(orderSource === true) {
+    if(orderSource) {
 
-        if(!(req.session.buyNow.quantity || req.session.buyNow.quantity)) throw new AppError('No item found',409)
+        if(!req.session.buyNow.productId || !req.session.buyNow.quantity) throw new AppError('No item found',404)
 
         const productSession= req.session.buyNow
+
+
         const buyNowProduct = await Product.findById(productSession.productId)
+
+      
 
         const newOrder = await Order.create({
             userId:user.id,
@@ -63,13 +64,13 @@ const createOrder = async(req) => {
         })
 
         req.session.buyNow = null
-        return {createdOrderItem,newOrder}
 
+        return {createdOrderItem,newOrder}
     }
 
     const cartItems = await CartItem.find({cartId:cart._id}).populate('productId')
 
-    if(!cartItems) throw new AppError('Cart items not found',404)
+    if(cartItems.length === 0) throw new AppError('Cart items not found',404)
 
 
     const orderItems = cartItems.map((item) => {
@@ -82,13 +83,13 @@ const createOrder = async(req) => {
      
     const products =  await getProducts(orderItems)
 
+
     const newOrder = await Order.create({
         userId:user.id,
         totalPrice:products.totalPrice,
         // items:orderItems,
         ...req.body,
     })
-
 
 
     const createOrderItem =  await Promise.all(
@@ -105,7 +106,7 @@ const createOrder = async(req) => {
 
     if(!newOrder) throw new AppError('Order not created',500)
     
-    if(!orderSource) await CartItem.deleteMany({cartId:cart._id})
+    await CartItem.deleteMany({cartId:cart._id})
 
     return {newOrder,createOrderItem}
 }
