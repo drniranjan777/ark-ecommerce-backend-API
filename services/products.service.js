@@ -2,6 +2,8 @@ const Product = require('../models/product')
 const AppError = require('../utils/AppError')
 const ProductReview = require('../models/productReview')
 const ProductSize = require('../models/productSize')
+const {WishlistItem} = require('../models/wishlist')
+const {CartItem} = require('../models/cart')
 
 
 //create product
@@ -126,6 +128,12 @@ const deleteProduct = async(req) => {
 
    const deletedProduct = await Product.findByIdAndDelete(productId);
 
+   await Promise.all([
+     WishlistItem.deleteMany({productId:productId}),
+     CartItem.deleteMany({productId:productId}),
+     ProductReview.deleteMany({productId:productId})
+   ])
+
   return deletedProduct;
 
 }
@@ -141,7 +149,7 @@ const createProductReview = async(req) => {
      review,
      rating
    })
-   console.log(user,'userrrrrr')
+  //  console.log(user,'userrrrrr')
    return createdReview
 }
 
