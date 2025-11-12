@@ -24,7 +24,10 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(helmet());
 
 //handle cors
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000', // frontend URL
+  credentials: true               // allow cookies
+}));
 
 //request body values
 app.use(express.json());
