@@ -10,7 +10,13 @@ const removeFromCartSchema = Joi.object({
   productId: Joi.string().hex().length(24).required()
 });
 
+
+const buyNowUpdateValidation = Joi.object({
+  quantity:Joi.number().required().min(1)
+});
+
 module.exports = {
   cartValidation,
-  removeFromCartSchema
+  removeFromCartSchema,
+  buyNowUpdateValidation
 };

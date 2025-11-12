@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const {OrderValidation,CommonValidate} = require('../validations/index')
+const {OrderValidation,CommonValidate,CartValidation} = require('../validations/index')
 const validate = require('../middlewares/validate')
 const {OrderController} = require('../controllers/index')
 const userAuth = require('../middlewares/userAuth')
@@ -764,6 +764,7 @@ router.post(
 
 router.post(
     '/buy-now',
+    validate(CartValidation.cartValidation),
     OrderController.buyNow
 )
 

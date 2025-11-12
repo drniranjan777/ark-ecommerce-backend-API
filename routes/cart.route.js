@@ -307,6 +307,7 @@ router.get('/',
 
 router.post('/update-buynow',
   userAuth,
+  validate(CartValidation.buyNowUpdateValidation),
   CartController.buyNowUpdateController
 );
 
