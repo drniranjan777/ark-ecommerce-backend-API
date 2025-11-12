@@ -253,4 +253,105 @@ router.get('/',
   CartController.getUserCartItems
 );
 
+
+/**
+ * @swagger
+ * /api/cart/update-buynow:
+ *   post:
+ *     summary: Update Buy Now quantity
+ *     description: >
+ *       Updates the quantity of the product stored in the user's "Buy Now" session.
+ *       The "Buy Now" session is used for checkout of a single product without affecting the main cart.
+ *     tags:
+ *       - Order buy now
+ *     security:
+ *       - bearerAuth: []   # Include only if JWT auth is used
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               quantity:
+ *                 type: integer
+ *                 example: 2
+ *                 description: The new quantity to set for the Buy Now product
+ *     responses:
+ *       200:
+ *         description: Buy Now quantity updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 productId:
+ *                   type: string
+ *                   example: "63f8d2a9e4b0e12f34ab5678"
+ *                 quantity:
+ *                   type: integer
+ *                   example: 2
+ *       404:
+ *         description: Buy Now product not available in session
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Buy now product not available"
+ */
+
+
+
+router.post('/update-buynow',
+  userAuth,
+  CartController.buyNowUpdateController
+);
+
+/**
+ * @swagger
+ * /api/cart/get-buynow:
+ *   get:
+ *     summary: Get Buy Now product
+ *     description: >
+ *       Fetches the product stored in the user's "Buy Now" session.
+ *       This session is used for checkout of a single product without affecting the main cart.
+ *     tags:
+ *       - Order buy now
+ *     security:
+ *       - bearerAuth: []   # Include only if JWT auth is used
+ *     responses:
+ *       200:
+ *         description: Buy Now product fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 productId:
+ *                   type: string
+ *                   example: "63f8d2a9e4b0e12f34ab5678"
+ *                 quantity:
+ *                   type: integer
+ *                   example: 2
+ *       404:
+ *         description: Buy Now product not available in session
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Buy now product not available"
+ */
+
+
+router.get('/get-buynow',
+  userAuth,
+  CartController.getBuyNowController
+);
+
 module.exports = router

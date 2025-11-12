@@ -60,10 +60,38 @@ const getUserCartItems = catchAsync(async(req,res) =>{
     })
 })
 
+
+//buy now update controller
+
+const buyNowUpdateController = catchAsync(async(req,res) => {
+    const result = await CartService.buyNowUpdate(req)
+
+    return res.status(200).send({
+        status:true,
+        message:"Buy now updated successfull",
+        data:result
+    })
+})
+
+//get buy now
+
+const getBuyNowController = catchAsync(async(req,res) => {
+    const result = await CartService.getBuyNow(req)
+
+    return res.status(200).send({
+        status:true,
+        message:"Buy now fetched successfull",
+        data:result
+    })
+})
+
 module.exports = {
     addItemToCart,
     updateCart,
     removeItemFromCart,
     clearCart,
-    getUserCartItems
+    getUserCartItems,
+
+    buyNowUpdateController,
+    getBuyNowController
 }

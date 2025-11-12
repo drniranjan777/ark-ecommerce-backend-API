@@ -135,10 +135,47 @@ const getUserCartItems = async(req) => {
    return {cartItems,totalPrice}
 }
 
+//buy now update 
+
+const buyNowUpdate = async(req) => {
+   const {quantity} = req.body
+
+     if (!req.session.buyNow) throw new AppError('Buy now product not available',404)
+
+   req.session.buyNow.quantity = quantity
+   
+   await req.session.save()
+   
+   return req.session.buyNow
+}
+
+
+//get buynow item
+
+const getBuyNow = async(req) => {
+
+    const productId = req.session.buyNow.productId
+    const quantity = req.session.buyNow.quantity
+
+    const product = await Product.findById(productId)
+
+    if(!product) throw new AppError('Product not found',404)
+    
+    return {
+        product,
+        quantity,
+        totalPrice : product.price * quantity
+    }
+
+}
+
 module.exports = {
     addItemToCart,
     updateCart,
     removeItemFromCart,
     clearCart,
-    getUserCartItems
+    getUserCartItems,
+
+    buyNowUpdate,
+    getBuyNow
 }
