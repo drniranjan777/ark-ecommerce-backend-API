@@ -60,6 +60,7 @@ app.use(
       maxAge: 1000 * 60 * 15, // 15 min
       secure: false, // true if using HTTPS
       httpOnly: true, // prevents JS access to cookie
+      sameSite: 'lax', 
     },
   })
 );
