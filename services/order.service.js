@@ -3,6 +3,7 @@ const Product = require('../models/product')
 const AppError = require('../utils/AppError')
 const {Cart,CartItem} = require('../models/cart')
 const OrderItem = require('../models/orderitem')
+const Coupon = require('../models/coupon')
 
 //get products
 const getProducts = async(orderItems) => {
@@ -29,12 +30,39 @@ const getProducts = async(orderItems) => {
 const createOrder = async(req) => {
     const user =  req.user
 
-    const orderSource = req.query.buyNow === "true"
+    const orderSource = req.query.buyNow === "true" 
+    const appliedCoupon = req.body.coupon
 
     let cart = await Cart.findOne({userId:user.id})
 
     if(!cart) cart = await Cart.create({userId:user.id})
 
+
+    const calculateTotal = async(rawPrice) => {
+
+        let discount = 0
+        let finalPrice = rawPrice
+
+
+        if(appliedCoupon){
+            const coupon = await Coupon.findOne({coupon : appliedCoupon})
+
+            if(!coupon) throw new AppError('Coupon not found',404)
+            
+            discount = (rawPrice * coupon.discount) / 100;
+
+            finalPrice = rawPrice - discount
+        }
+
+       
+  
+        return {
+            finalPrice,
+            discount,
+            rawPrice
+        }
+
+    }
 
     if(orderSource) {
 
@@ -42,14 +70,17 @@ const createOrder = async(req) => {
 
         const productSession= req.session.buyNow
 
-
         const buyNowProduct = await Product.findById(productSession.productId)
 
-      
+        const orderPrice = await calculateTotal(buyNowProduct.price*productSession.quantity)
+
 
         const newOrder = await Order.create({
             userId:user.id,
-            totalPrice:buyNowProduct.price*productSession.quantity,
+            totalPrice:Math.floor(orderPrice.finalPrice),
+            discount:Math.floor(orderPrice.discount),
+            rawPrice:orderPrice.rawPrice,
+            appliedCoupon:appliedCoupon?appliedCoupon:'No coupon applied',
             // items:orderItems,
             ...req.body,
         })
@@ -59,7 +90,10 @@ const createOrder = async(req) => {
             orderId: newOrder.orderId,
             productId: productSession.productId,
             quantity: productSession.quantity,
-            unitPrice: buyNowProduct.price * productSession.quantity,
+            unitPrice: orderPrice.finalPrice,
+            discount:orderPrice.discount,
+            rawPrice:orderPrice.rawPrice,
+            appliedCoupon:appliedCoupon?appliedCoupon:'No coupon applied'
             // totalPrice: item.price * item.quantity,
         })
 
@@ -83,10 +117,14 @@ const createOrder = async(req) => {
      
     const products =  await getProducts(orderItems)
 
+    const orderPrice = await calculateTotal(products.totalPrice)
 
     const newOrder = await Order.create({
         userId:user.id,
-        totalPrice:products.totalPrice,
+        totalPrice:orderPrice.finalPrice,
+        discount:orderPrice.discount,
+        rawPrice:orderPrice.rawPrice,
+        appliedCoupon:appliedCoupon?appliedCoupon:'No coupon applied',
         // items:orderItems,
         ...req.body,
     })
@@ -99,6 +137,9 @@ const createOrder = async(req) => {
             productId: item.productId,
             quantity: item.quantity,
             unitPrice: item.productId.price * item.quantity,
+            discount:orderPrice.discount,
+            rawPrice:orderPrice.rawPrice,
+            appliedCoupon:appliedCoupon?appliedCoupon:'No coupon applied'
             // totalPrice: item.price * item.quantity,
           })
         })

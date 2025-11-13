@@ -17,6 +17,15 @@ const orderItemSchema = new mongoose.Schema({
     enum: ["none", "initiated", "completed", "failed"],
     default: "none"
   },
+  rawPrice:{
+    type:Number
+  },
+  discount:{
+    type:Number
+  },
+  appliedCoupon:{
+    type:String
+  },
   createdAt: { type: Date, default: Date.now }
 });
 

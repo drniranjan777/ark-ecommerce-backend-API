@@ -35,7 +35,10 @@ const orderValidation = Joi.object({
 
   paymentStatus: Joi.string()
     .valid('unpaid', 'paid', 'failed')
-    .required()
+    .required(),
+
+  coupon:Joi.string(),
+
 });
 
 const updateOrderItemStatus = Joi.object({

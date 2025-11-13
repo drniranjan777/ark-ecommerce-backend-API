@@ -44,6 +44,16 @@ const orderSchema = new mongoose.Schema({
     type:Number,
     required:true
   },
+  appliedCoupon:{
+    type:String,
+    trim:true
+  },
+  discount :{
+    type:Number
+  },
+  rawPrice:{
+    type:Number
+  },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

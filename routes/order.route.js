@@ -28,7 +28,6 @@ const userAuth = require('../middlewares/userAuth')
  *           schema:
  *             type: object
  *             required:
- *               - items
  *               - address
  *             properties:
  *               address:
@@ -70,6 +69,10 @@ const userAuth = require('../middlewares/userAuth')
  *                 type: string
  *                 enum: ['pending','confirmed','shipped','delivered','cancelled']
  *                 example: "confirmed"
+ *               coupon:
+ *                 type: string
+ *                 example: "NEWUSER10"
+ *                 description: Optional coupon code applied to the order
  *     responses:
  *       201:
  *         description: Order created successfully
@@ -93,6 +96,7 @@ const userAuth = require('../middlewares/userAuth')
  *       500:
  *         description: Internal server error
  */
+
 
 
 router.post(
