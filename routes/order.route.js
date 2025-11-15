@@ -303,21 +303,6 @@ router.get(
  *       - Orders
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name: startDate
- *         schema:
- *           type: string
- *           format: date
- *         required: false
- *         description: Filter analytics starting from this date (YYYY-MM-DD)
- *       - in: query
- *         name: endDate
- *         schema:
- *           type: string
- *           format: date
- *         required: false
- *         description: Filter analytics up to this date (YYYY-MM-DD)
  *     responses:
  *       200:
  *         description: Order analytics retrieved successfully
@@ -343,12 +328,12 @@ router.get(
  *                     cancelled: 150
  *                     refunded: 10
  *                   description: Breakdown of orders by their status
- *          
  *       400:
- *         description: Invalid date format or bad request
+ *         description: Bad request
  *       500:
  *         description: Internal server error
  */
+
 
 router.get(
     '/analytics',

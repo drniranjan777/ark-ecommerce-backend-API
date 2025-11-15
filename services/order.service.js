@@ -140,6 +140,7 @@ const createOrder = async(req) => {
             discount:orderPrice.discount,
             rawPrice:orderPrice.rawPrice,
             appliedCoupon:appliedCoupon?appliedCoupon:'No coupon applied'
+            
             // totalPrice: item.price * item.quantity,
           })
         })
@@ -262,12 +263,29 @@ const orderAnalytics = async(req,res) => {
 
   if(!orders) throw new AppError('Orders not fetched',500)
 
+  const totalRevenue = orders.reduce((acc,item) => {return acc+Number(item.totalPrice)},0)
 
-  const totalPrice = orders.reduce((acc,item) => {return acc+item.totalPrice},0)
+  const result = await Order.aggregate([
+    {
+        $group: {
+        _id: null,
+        total: { $sum: 1 },
+        pending: { $sum: { $cond: [{ $eq: ["$status", "pending"] }, 1, 0] } },
+        confirmed: { $sum: { $cond: [{ $eq: ["$status", "confirmed"] }, 1, 0] } },
+        shipped: { $sum: { $cond: [{ $eq: ["$status", "shipped"] }, 1, 0] } },
+        cancelled: { $sum: { $cond: [{ $eq: ["$status", "cancelled"] }, 1, 0] } },
+        }
+    }
+   ]);
 
-  const totalOrders = await Order.countDocuments()
-  const pendingOrders = await Order.find({status:'pending'}).countDocuments()
-  const confirmedOrders = await Order.find({status:'confirmed'}).countDocuments()
+  const statistics = result[0];
+
+  return {
+    totalRevenue:Math.floor(totalRevenue),
+    averagePrice:Math.floor(totalRevenue/statistics.total),
+    statistics
+  }
+
 }
 
 //order details
