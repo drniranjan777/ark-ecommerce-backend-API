@@ -115,6 +115,18 @@ const buyNow = catchAsync(async(req,res) => {
    })
 })
 
+
+//verify order payment controller
+const verifyOrder = catchAsync(async(req,res) => {
+   const result = await OrderService.verifyOrder(req)
+
+   return res.status(200).json({
+    status:true,
+    message:'verify payment sucessfull',
+    data:result
+   })
+})
+
 module.exports = {
     createOrder,
     getUserOrders,
@@ -128,5 +140,6 @@ module.exports = {
     updateRefundStatus,
     getOrderedStatusItems,
 
-    buyNow
+    buyNow,
+    verifyOrder
 }

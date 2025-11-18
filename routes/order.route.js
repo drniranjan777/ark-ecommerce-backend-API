@@ -61,14 +61,6 @@ const userAuth = require('../middlewares/userAuth')
  *                   phone:
  *                     type: string
  *                     example: "+91 9876543210"
- *               paymentStatus:
- *                 type: string
- *                 enum: [paid, unpaid, failed]
- *                 example: "paid"
- *               status:
- *                 type: string
- *                 enum: ['pending','confirmed','shipped','delivered','cancelled']
- *                 example: "confirmed"
  *               coupon:
  *                 type: string
  *                 example: "NEWUSER10"
@@ -753,8 +745,106 @@ router.post(
 
 router.post(
     '/buy-now',
+    userAuth,
     validate(CartValidation.cartValidation),
     OrderController.buyNow
+)
+
+/**
+ * @swagger
+ * /api/order/verify-payment:
+ *   post:
+ *     summary: Verify Razorpay payment signature
+ *     description: |
+ *       This endpoint verifies the Razorpay payment using the HMAC SHA256 signature.
+ *       The frontend must send the Razorpay payment details returned after a successful checkout.
+ *       The server will validate the signature and update the order status accordingly.
+ *     tags:
+ *       - Payments
+ *     security:
+ *       - bearerAuth: []   # Add only if JWT authentication is required
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - razorpayOrderId
+ *               - razorpayPaymentId
+ *               - razorpaySignature
+ *               - paymentGatewayId
+ *             properties:
+ *               razorpayOrderId:
+ *                 type: string
+ *                 example: "order_RhAB6SbKTdA0UG"
+ *                 description: Razorpay Order ID returned by Razorpay Checkout (order_id).
+ *               razorpayPaymentId:
+ *                 type: string
+ *                 example: "pay_P3kS29aqy12K9T"
+ *                 description: Razorpay Payment ID returned after successful payment.
+ *               razorpaySignature:
+ *                 type: string
+ *                 example: "3b7c8f8bf2d66a1474c6e9d543a907f99aa17c7bf55d..."
+ *                 description: HMAC SHA256 signature used to verify the payment.
+ *               paymentGatewayId:
+ *                 type: string
+ *                 example: "order_RhAB6SbKTdA0UG"
+ *                 description: Internal field (usually same as Razorpay Order ID) mapped to your database.
+ *     responses:
+ *       200:
+ *         description: Payment verified successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Payment verified successfully"
+ *                 order:
+ *                   type: object
+ *                   description: Updated order details after verification
+ *       400:
+ *         description: Invalid or tampered signature
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid payment signature"
+ *       404:
+ *         description: Order not found for the given paymentGatewayId
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Order not found"
+ *       500:
+ *         description: Internal server error
+ */
+
+
+
+router.post(
+    '/verify-payment',
+    userAuth,
+    validate(OrderValidation.verifyPayment),
+    OrderController.verifyOrder
 )
 
 module.exports = router

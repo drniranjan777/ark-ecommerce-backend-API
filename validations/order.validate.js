@@ -29,15 +29,15 @@ const orderValidation = Joi.object({
   //   .min(1)
   //   .required(),
 
-  status: Joi.string()
-    .valid('pending','confirmed', 'shipped', 'delivered', 'cancelled')
-    .required(),
+  // status: Joi.string()
+  //   .valid('pending','confirmed', 'shipped', 'delivered', 'cancelled')
+  //   .required(),
 
-  paymentStatus: Joi.string()
-    .valid('unpaid', 'paid', 'failed')
-    .required(),
+  // paymentStatus: Joi.string()
+  //   .valid('unpaid', 'paid', 'failed')
+  //   .required(),
 
-  coupon:Joi.string(),
+  coupon:Joi.string().allow(null, ''),
 
 });
 
@@ -57,9 +57,17 @@ const orderStatus = Joi.object({
    status: Joi.string().required()
 })
 
+const verifyPayment = Joi.object({
+   razorpayOrderId: Joi.string().required(),
+   razorpayPaymentId: Joi.string().required(),
+   razorpaySignature: Joi.string().required(),
+   paymentGatewayId:Joi.string().required()
+})
+
 module.exports = {
     orderValidation,
     updateOrderItemStatus,
     updateRefundStatus,
-    orderStatus
+    orderStatus,
+    verifyPayment
 }

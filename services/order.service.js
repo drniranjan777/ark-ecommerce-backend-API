@@ -4,6 +4,7 @@ const AppError = require('../utils/AppError')
 const {Cart,CartItem} = require('../models/cart')
 const OrderItem = require('../models/orderitem')
 const Coupon = require('../models/coupon')
+const {createRazorpayOrder,verifyRazorpaySignature} = require('../utils/payment')
 
 //get products
 const getProducts = async(orderItems) => {
@@ -97,9 +98,19 @@ const createOrder = async(req) => {
             // totalPrice: item.price * item.quantity,
         })
 
+        const payment = await createRazorpayOrder(
+            orderPrice.finalPrice,
+            newOrder.orderId,
+            newOrder._id.toString(),
+            "Buy Now Order"
+        );
+
+        newOrder.paymentOrderId = payment.gatewayId;
+        await newOrder.save();
+
         req.session.buyNow = null
 
-        return {createdOrderItem,newOrder}
+        return {createdOrderItem,newOrder,payment}
     }
 
     const cartItems = await CartItem.find({cartId:cart._id}).populate('productId')
@@ -147,12 +158,47 @@ const createOrder = async(req) => {
     )
 
     if(!newOrder) throw new AppError('Order not created',500)
+
+    const payment = await createRazorpayOrder(
+        orderPrice.finalPrice,
+        newOrder.orderId,
+        newOrder._id.toString(),
+        "Buy Now Order"
+    );
+
+    newOrder.paymentOrderId = payment.gatewayId;
+    await newOrder.save();
     
     await CartItem.deleteMany({cartId:cart._id})
 
-    return {newOrder,createOrderItem}
+    return {newOrder,createOrderItem,payment}
 }
 
+//verify  order payment
+
+const verifyPayment = async(req) => {
+    const {razorpayOrderId,razorpayPaymentId,razorpaySignature,paymentGatewayId} = req.body
+
+    const checkPaymentOrder = await Order.findOne({paymentOrderId:paymentOrderId})
+
+    if(!checkPaymentOrder) throw new AppError('Order not found',404)
+    
+    const attributes = {
+        orderCreationId: razorpayOrderId,
+        razorpayPaymentId: razorpayPaymentId,
+        razorpaySignature: razorpaySignature,
+    };
+
+    const isValid = await verifyRazorpaySignature(attributes);
+
+    if(!isValid) throw new AppError("Failed to verify payment",400) 
+
+    await Order.findOneAndUpdate(
+        {paymentOrderId:paymentGatewayId},
+        {$set:{status:'confirmed',paymentStatus:'paid'}},
+        {new:true}
+    )
+}
 
 
 //get user orders
@@ -370,5 +416,6 @@ module.exports = {
     updateRefundStatus,
     getOrderProductsByStatus,
 
-    buyNowFunction
+    buyNowFunction,
+    verifyPayment
 }

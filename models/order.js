@@ -54,6 +54,12 @@ const orderSchema = new mongoose.Schema({
   rawPrice:{
     type:Number
   },
+  paymentOrderId:{
+    type:String
+  },
+  transactionId:{
+    type:String
+  },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
