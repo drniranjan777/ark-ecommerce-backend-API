@@ -348,4 +348,116 @@ router.post('/forget-password', UserController.forgetPassword);
 
 router.post('/reset-password', UserController.resetPassword);
 
+
+/**
+ * @swagger
+ * /api/user/otp-login:
+ *   post:
+ *     summary: Send OTP to user's mobile number for login
+ *     tags: [User]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - mobileNumber
+ *             properties:
+ *               mobileNumber:
+ *                 type: string
+ *                 description: User's mobile number to receive the OTP
+ *                 example: "9876543210"
+ *     responses:
+ *       200:
+ *         description: OTP sent successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "OTP sent successfully"
+ *       400:
+ *         description: Invalid request or mobile number
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid mobile number"
+ */
+
+router.post('/otp-login', UserController.sendOtp);
+
+
+/**
+ * @swagger
+ * /api/user/verify-otp:
+ *   post:
+ *     summary: Verify OTP for user's mobile number and login
+ *     tags: [User]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - mobileNumber
+ *               - otp
+ *             properties:
+ *               mobileNumber:
+ *                 type: string
+ *                 description: User's mobile number used to receive the OTP
+ *                 example: "9876543210"
+ *               otp:
+ *                 type: number
+ *                 description: OTP received on the user's mobile
+ *                 example: 123456
+ *     responses:
+ *       200:
+ *         description: OTP verified successfully and JWT returned
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "OTP verified successfully"
+ *                 token:
+ *                   type: string
+ *                   description: JWT token for authenticated user
+ *                 payload:
+ *                   type: object
+ *                   description: User details included in the token
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: "64f8d8b2a3e2b12c3456789a"
+ *                     mobileNumber:
+ *                       type: string
+ *                       example: "9876543210"
+ *                     status:
+ *                       type: string
+ *                       example: "active"
+ *       400:
+ *         description: Invalid OTP or request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid OTP or session expired"
+ */
+
+router.post('/verify-otp', UserController.verifyOtp);
+
+
 module.exports = router

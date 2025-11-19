@@ -82,6 +82,28 @@ const resetPassword = catchAsync(async (req, res) => {
   });
 })
 
+// send otp to mobile number
+const sendOtp= catchAsync(async (req, res) => {
+  const result = await UserService.sendOtp(req);
+
+  res.status(200).json({
+    success: true,
+    message: 'Otp sent successfull',
+    data: result,
+  });
+})
+
+// verify otp
+const verifyOtp= catchAsync(async (req, res) => {
+  const result = await UserService.verifyOtpService(req);
+
+  res.status(200).json({
+    success: true,
+    message: 'Otp verified successfull',
+    data: result,
+  });
+})
+
 module.exports = {
   registerUser,
   loginUser,
@@ -90,5 +112,8 @@ module.exports = {
   getAllUsers,
 
   forgetPassword,
-  resetPassword
+  resetPassword,
+
+  sendOtp,
+  verifyOtp
 };

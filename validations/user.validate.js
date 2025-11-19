@@ -38,4 +38,31 @@ const userLogin = Joi.object({
   }),
 })
 
-module.exports = { userRegister,userLogin};
+const sendOtp = Joi.object({
+  mobileNumber: Joi.string()
+    .length(10) 
+    .pattern(/^[0-9]+$/) 
+    .required()
+    .messages({
+      "string.base": "Mobile number must be a string",
+      "string.length": "Mobile number must be exactly 10 digits",
+      "string.pattern.base": "Mobile number must contain only digits",
+      "any.required": "Mobile number is required",
+    }),
+})
+
+const verifyOtp = Joi.object({
+  mobileNumber: Joi.string()
+    .length(10) 
+    .pattern(/^[0-9]+$/) 
+    .required()
+    .messages({
+      "string.base": "Mobile number must be a string",
+      "string.length": "Mobile number must be exactly 10 digits",
+      "string.pattern.base": "Mobile number must contain only digits",
+      "any.required": "Mobile number is required",
+    }),
+  otp:Joi.number().required()
+})
+
+module.exports = { userRegister,userLogin,sendOtp,verifyOtp};

@@ -4,6 +4,8 @@ const AppError = require('../utils/AppError');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto')
 const transporter = require('../config/mailer')
+const generateOtp = require('../utils/generateOtp')
+const {sendSms,verifyOtp } = require('./sms.service')
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 const JWT_EXPIRES_IN = '1d';
@@ -191,6 +193,75 @@ const resetPasswordService = async (req) => {
   return
 };
 
+//send otp
+
+const sendOtp = async(req) => {
+  const {mobileNumber} = req.body
+
+  let user = await User.findOne({mobileNumber:mobileNumber})
+
+  if(!user) {
+     user = await User.create({
+      mobileNumber:mobileNumber
+     })
+  }
+
+  // const otp = generateOtp();
+  // const hashedOtp = await bcrypt.hash(String(otp), 10);
+
+  
+  // user.otpExpires = Date.now() + 5 * 60 * 1000; // 5 minutes
+
+  if (user.otpSentAt && Date.now() - user.otpSentAt.getTime() < 60000) { // 1 min
+    throw new Error("Please wait before resending OTP");
+  }
+
+  const sessionId = await sendSms(mobileNumber);
+
+  user.otpSession = sessionId
+  user.otpSentAt = new Date();
+  user.otpResendCount = (user.otpResendCount || 0) + 1;
+
+  await user.save();
+
+  return otpResponse
+}
+
+
+//verify otp
+
+const verifyOtpService = async(req) => {
+  const {mobileNumber,otp} = req.body
+
+  const user = await User.findOne({mobileNumber:mobileNumber})
+
+  const data = await verifyOtp(user.otpSession,otp)
+
+
+
+  if (data.Status !== "Success") {
+    throw new AppError(data.Details || "Invalid OTP",400);
+  }
+
+
+  user.otpSession = null;
+  user.otpSentAt = null;
+  user.otpResendCount = 0;
+  
+  await user.save();
+
+   const payload = {
+    id: user._id,
+    // email: user.email,
+    // name: user.name,
+    status: user.status,
+  };
+
+  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+
+  return {token,payload}
+}
+
 module.exports = {
   userRegister,
   loginUser,
@@ -199,5 +270,8 @@ module.exports = {
   getAllUsers,
 
   forgotPasswordService,
-  resetPasswordService
+  resetPasswordService,
+
+  sendOtp,
+  verifyOtpService
 };
