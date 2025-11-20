@@ -4,7 +4,7 @@ const ProductReview = require('../models/productReview')
 const ProductSize = require('../models/productSize')
 const {WishlistItem} = require('../models/wishlist')
 const {CartItem} = require('../models/cart')
-
+const OrderItem = require("../models/orderitem")
 
 //create product
 const createProduct = async(req) => {
@@ -143,6 +143,11 @@ const deleteProduct = async(req) => {
 const createProductReview = async(req) => {
    const user = req.user
    const { product, rating, review } = req.body;
+
+   const checkProduct = await OrderItem.findOne({productId:product,userId:user.id})
+
+   if(!checkProduct) throw new AppError('you are not allowed to create review,because your have not purchased this product',409)
+
    const createdReview = await ProductReview.create({
      product,
      user:user.id,

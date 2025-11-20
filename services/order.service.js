@@ -94,7 +94,8 @@ const createOrder = async(req) => {
             unitPrice: orderPrice.finalPrice,
             discount:orderPrice.discount,
             rawPrice:orderPrice.rawPrice,
-            appliedCoupon:appliedCoupon?appliedCoupon:'No coupon applied'
+            appliedCoupon:appliedCoupon?appliedCoupon:'No coupon applied',
+            userId:user.id
             // totalPrice: item.price * item.quantity,
         })
 
@@ -156,8 +157,8 @@ const createOrder = async(req) => {
             unitPrice: item.productId.price * item.quantity,
             discount:orderPrice.discount,
             rawPrice:orderPrice.rawPrice,
-            appliedCoupon:appliedCoupon?appliedCoupon:'No coupon applied'
-            
+            appliedCoupon:appliedCoupon?appliedCoupon:'No coupon applied',
+            userId:user.id
             // totalPrice: item.price * item.quantity,
           })
         })

@@ -4,6 +4,7 @@ const Order = require('./order')
 
 const orderItemSchema = new mongoose.Schema({
   orderId: { type: String, ref: Order, index: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, index: true },
   productId: { type: mongoose.Schema.Types.ObjectId, ref: Product, index: true },
   quantity: { type: Number, required: true },
   unitPrice: { type: Number, required: true }, 
