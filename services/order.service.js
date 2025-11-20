@@ -105,12 +105,10 @@ const createOrder = async(req) => {
             "Buy Now Order"
         );
 
-        console.log(payment,'paymentttttttttttttttttttttttttttttttt')
-
         newOrder.paymentOrderId = payment.razorpayOrderId;
         await newOrder.save();
 
-        req.session.buyNow = null
+        // req.session.buyNow = null
 
         return {
             createdOrderItem,
@@ -177,7 +175,7 @@ const createOrder = async(req) => {
     newOrder.paymentOrderId = payment.razorpayOrderId;
     await newOrder.save();
     
-    await CartItem.deleteMany({cartId:cart._id})
+    // await CartItem.deleteMany({cartId:cart._id})
 
     return {
         newOrder,
@@ -192,6 +190,13 @@ const createOrder = async(req) => {
 
 const verifyPayment = async(req) => {
     const {razorpayOrderId,razorpayPaymentId,razorpaySignature,paymentGatewayId} = req.body
+
+    const user =  req.user
+
+    let cart = await Cart.findOne({userId:user.id})
+
+    if(!cart) cart = await Cart.create({userId:user.id})
+
 
     const checkPaymentOrder = await Order.findOne({paymentOrderId:paymentGatewayId})
 
@@ -212,6 +217,11 @@ const verifyPayment = async(req) => {
         {$set:{status:'confirmed',paymentStatus:'paid'}},
         {new:true}
     )
+
+    req.session.buyNow = null  
+    await CartItem.deleteMany({cartId:cart._id})
+
+    return
 }
 
 

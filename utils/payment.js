@@ -37,10 +37,14 @@ async function createRazorpayOrder(amount, orderId, databaseId, extraComments) {
   const order = await razorpayClient.orders.create(options);
 
   return {
-    razorpayOrderId: order.id,
-    reference: order.id,
-    paid: order.amount_paid / 100,
-    due: order.amount_due / 100,
+    // razorpayOrderId: order.id,
+    // reference: order.id,
+    // paid: order.amount_paid / 100,
+    // due: order.amount_due / 100,
+    gatewayId: order.id,        
+    razorpayOrderId: order.id,   
+    amount: order.amount / 100,  
+    currency: order.currency,
   };
 }
 
