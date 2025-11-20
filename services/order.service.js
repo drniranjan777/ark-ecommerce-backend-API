@@ -105,12 +105,20 @@ const createOrder = async(req) => {
             "Buy Now Order"
         );
 
-        newOrder.paymentOrderId = payment.gatewayId;
+        console.log(payment,'paymentttttttttttttttttttttttttttttttt')
+
+        newOrder.paymentOrderId = payment.razorpayOrderId;
         await newOrder.save();
 
         req.session.buyNow = null
 
-        return {createdOrderItem,newOrder,payment}
+        return {
+            createdOrderItem,
+            newOrder,
+            razorpayOrderId: payment.razorpayOrderId,
+            amount: payment.due * 100,      
+            currency: "INR"
+        }
     }
 
     const cartItems = await CartItem.find({cartId:cart._id}).populate('productId')
@@ -166,12 +174,18 @@ const createOrder = async(req) => {
         "Buy Now Order"
     );
 
-    newOrder.paymentOrderId = payment.gatewayId;
+    newOrder.paymentOrderId = payment.razorpayOrderId;
     await newOrder.save();
     
     await CartItem.deleteMany({cartId:cart._id})
 
-    return {newOrder,createOrderItem,payment}
+    return {
+        newOrder,
+        createOrderItem,
+        razorpayOrderId: payment.razorpayOrderId,
+        amount: payment.due * 100,      
+        currency: "INR"
+    }
 }
 
 //verify  order payment
@@ -179,14 +193,14 @@ const createOrder = async(req) => {
 const verifyPayment = async(req) => {
     const {razorpayOrderId,razorpayPaymentId,razorpaySignature,paymentGatewayId} = req.body
 
-    const checkPaymentOrder = await Order.findOne({paymentOrderId:paymentOrderId})
+    const checkPaymentOrder = await Order.findOne({paymentOrderId:paymentGatewayId})
 
     if(!checkPaymentOrder) throw new AppError('Order not found',404)
     
     const attributes = {
-        orderCreationId: razorpayOrderId,
-        razorpayPaymentId: razorpayPaymentId,
-        razorpaySignature: razorpaySignature,
+        razorpay_order_id: razorpayOrderId,
+        razorpay_payment_id: razorpayPaymentId,
+        razorpay_signature: razorpaySignature,
     };
 
     const isValid = await verifyRazorpaySignature(attributes);

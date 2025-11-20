@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema(
   {
-    // email: { type: String, required: true, unique: true },
-    // password: { type: String, required: true },
-    // name:{type:String,required:true},
+    email: { type: String, unique: true },
+    password: { type: String },
+    name:{type:String,},
     mobileNumber:{type:Number,required:true},
     status: {
       type: String,
@@ -12,11 +12,11 @@ const userSchema = new mongoose.Schema(
       default: 'active',      
       required: true,
     },
-    // resetPasswordToken: {
-    //   type:String,
+    resetPasswordToken: {
+      type:String,
       
-    // },
-    // resetPasswordExpires: Date,
+    },
+    resetPasswordExpires: Date,
     otpSession: String,
     otpSentAt: Date,
     otpResendCount: { type: Number, default: 0 }

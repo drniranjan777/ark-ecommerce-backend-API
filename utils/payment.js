@@ -37,7 +37,7 @@ async function createRazorpayOrder(amount, orderId, databaseId, extraComments) {
   const order = await razorpayClient.orders.create(options);
 
   return {
-    gatewayId: order.id,
+    razorpayOrderId: order.id,
     reference: order.id,
     paid: order.amount_paid / 100,
     due: order.amount_due / 100,
@@ -46,18 +46,18 @@ async function createRazorpayOrder(amount, orderId, databaseId, extraComments) {
 
 // --- 3. VERIFY PAYMENT ---
 function verifyRazorpaySignature({
-  orderCreationId,
-  razorpayPaymentId,
-  razorpaySignature,
+   razorpay_order_id,
+  razorpay_payment_id,
+  razorpay_signature,
 }) {
-  const data = `${orderCreationId}|${razorpayPaymentId}`;
+  const data = `${razorpay_order_id}|${razorpay_payment_id}`;
 
   const digest = crypto
     .createHmac("sha256", process.env.SETTINGS_PAYMENT_GATEWAY_SECRET)
     .update(data)
     .digest("hex");
 
-  return digest === razorpaySignature;
+  return digest === razorpay_signature;
 }
 
 module.exports = {

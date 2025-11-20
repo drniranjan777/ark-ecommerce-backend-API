@@ -224,7 +224,7 @@ const sendOtp = async(req) => {
 
   await user.save();
 
-  return otpResponse
+  return 
 }
 
 
