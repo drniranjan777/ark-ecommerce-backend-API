@@ -335,7 +335,8 @@ const updateOrder = async(req) => {
 
     
 
-    const mailOptions = {
+    if(user.email){
+      const mailOptions = {
         from: `"My App" <${process.env.SMTP_USER}>`,
         to: user.email,
         subject: "Your order status changed",
@@ -346,6 +347,7 @@ const updateOrder = async(req) => {
       };
     
       await transporter.sendMail(mailOptions)
+    }
 
     return updatedOrder
 }
