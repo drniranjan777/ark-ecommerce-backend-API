@@ -4,7 +4,10 @@ const AppError = require('../utils/AppError')
 const {Cart,CartItem} = require('../models/cart')
 const OrderItem = require('../models/orderitem')
 const Coupon = require('../models/coupon')
+const User = require('../models/user')
 const {createRazorpayOrder,verifyRazorpaySignature} = require('../utils/payment')
+const transporter = require('../config/mailer')
+
 
 //get products
 const getProducts = async(orderItems) => {
@@ -311,10 +314,16 @@ const getAllOrders = async(req) => {
 //update order
 const updateOrder = async(req) => {
     const {orderId} = req.params
+
+     const {status} = req.body
     
     const checkOrder = await Order.findOne({orderId:orderId})
 
     if(!checkOrder) throw new AppError('Order not found',404)
+
+    const user = await User.findById(checkOrder.userId)
+
+    if(!user) throw new AppError('user not found',404)
 
     const updatedOrder = await Order.updateOne(
         {orderId:orderId},
@@ -323,6 +332,20 @@ const updateOrder = async(req) => {
     )
 
     if(!updatedOrder) throw new AppError('Order not updated',500)
+
+    
+
+    const mailOptions = {
+        from: `"My App" <${process.env.SMTP_USER}>`,
+        to: user.email,
+        subject: "Your order status changed",
+        html: `
+          <p>Your order status is changed:${status}.</p>
+          
+        `,
+      };
+    
+      await transporter.sendMail(mailOptions)
 
     return updatedOrder
 }
