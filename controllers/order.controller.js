@@ -118,7 +118,7 @@ const buyNow = catchAsync(async(req,res) => {
 
 //verify order payment controller
 const verifyOrder = catchAsync(async(req,res) => {
-   const result = await OrderService.verifyOrder(req)
+   const result = await OrderService.verifyPayment(req)
 
    return res.status(200).json({
     status:true,
