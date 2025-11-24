@@ -167,6 +167,10 @@ router.get(
  *                 type: string
  *                 enum: [unpaid, paid, failed]
  *                 example: paid
+ *               refundStatus:
+ *                 type: string
+ *                 enum: [none, initiated, completed, failed]
+ *                 example: completed
  *               address:
  *                 type: object
  *                 properties:
@@ -237,6 +241,13 @@ router.put(
  *           minimum: 1
  *         description: Number of orders per page (default is 10)
  *         example: 10
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           minimum: 1
+ *         description: Enter order status
+ *         example: shipped
  *     responses:
  *       200:
  *         description: Successfully fetched orders
