@@ -13,9 +13,9 @@ const userRegister = Joi.object({
     'string.empty': 'Name cannot be empty',
     'any.required': 'Name is required',
   }),
-  mobileNumber: Joi.number().integer().optional().messages({
-    'number.base': 'Mobile Number must be a number',
-  }),
+  // mobileNumber: Joi.number().integer().optional().messages({
+  //   'number.base': 'Mobile Number must be a number',
+  // }),
 });
 
 
