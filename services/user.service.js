@@ -53,13 +53,14 @@ const loginUser = async (req) => {
 
   // console.log(user,'user..............')
 
+  if (!user) {
+    throw new AppError('Invalid email or password', 400);
+  }
+
   if(user.status === 'block'){
     throw new AppError('You are Blocked from admin',403)
   }
 
-  if (!user) {
-    throw new AppError('Invalid email or password', 400);
-  }
 
   const isPasswordValid = await verifyPassword(user, password);
   if (!isPasswordValid) {
@@ -200,9 +201,12 @@ const sendOtp = async(req) => {
 
   let user = await User.findOne({mobileNumber:mobileNumber})
 
+  console.log(user,'userrrrrrrrrrrrr')
+
   if(!user) {
      user = await User.create({
-      mobileNumber:mobileNumber
+      mobileNumber:mobileNumber,
+      email:undefined
      })
   }
 

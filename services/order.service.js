@@ -464,7 +464,7 @@ const orderAnalytics = async (req, res) => {
 const orderDetails = async (req) => {
   const { orderId } = req.params;
 
-  const orderDetails = await OrderItem.find({ orderId: orderId }).populate(
+  const orderDetails = await Order.find({ orderId: orderId }).populate(
     "productId"
   );
 
