@@ -18,6 +18,7 @@ const aboutRoutes = require('./about.route')
 const termsAndConditonsRoutes = require('./termsandconditons.route')
 const blogRoutes = require('./blog.route')
 const newsletterRoutes = require('./newsletter.route')
+const colorRoutes = require('./color.route')
 
 router.use('/admin', adminRoutes)
 router.use('/user', userRoutes)
@@ -34,5 +35,6 @@ router.use('/about',aboutRoutes)
 router.use('/terms',termsAndConditonsRoutes)
 router.use('/blog',blogRoutes)
 router.use('/newsletter',newsletterRoutes)
+router.use('/color',colorRoutes)
 
 module.exports = router;

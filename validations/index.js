@@ -14,5 +14,6 @@ module.exports.AboutValidation = require('./about.validate')
 module.exports.TermsAndConditionsValidation = require('./termsandconditons.validate')
 module.exports.BlogValidation = require('./blog.validate')
 module.exports.NewsletterValidation = require('./newsletter.validate')
+module.exports.ColorValidation = require('./color.validate')
 
 module.exports.CommonValidate = require('./global.validate')
