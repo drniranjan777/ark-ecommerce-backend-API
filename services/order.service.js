@@ -5,6 +5,7 @@ const { Cart, CartItem } = require("../models/cart");
 const OrderItem = require("../models/orderitem");
 const Coupon = require("../models/coupon");
 const User = require("../models/user");
+const Category = require("../models/category");
 const {
   createRazorpayOrder,
   verifyRazorpaySignature,
@@ -425,30 +426,74 @@ const orderAnalytics = async (req, res) => {
   }));
 
   // ---------- 4️⃣ CATEGORY ANALYTICS ----------
-  const categoryAnalytics = await OrderItem.aggregate([
+  // const categoryAnalytics = await OrderItem.aggregate([
+  //   {
+  //     $lookup: {
+  //       from: "products",
+  //       localField: "productId",
+  //       foreignField: "_id",
+  //       as: "product",
+  //     },
+  //   },
+  //   { $unwind: "$product" },
+
+  //   {
+  //     $group: {
+  //       _id: "$product.category",
+  //       value: { $sum: "$unitPrice" },
+  //     },
+  //   },
+  //   {
+  //     $project: {
+  //       name: "$_id",
+  //       value: 1,
+  //       _id: 0,
+  //     },
+  //   },
+  // ]);
+
+  const categoryAnalytics = await Category.aggregate([
+    // 1. Lookup products in this category
     {
       $lookup: {
         from: "products",
-        localField: "productId",
-        foreignField: "_id",
-        as: "product",
+        localField: "category",
+        foreignField: "category", // match by name
+        as: "products",
       },
     },
-    { $unwind: "$product" },
-
+    // 2. Lookup order items for these products
     {
-      $group: {
-        _id: "$product.category",
-        value: { $sum: "$unitPrice" },
+      $lookup: {
+        from: "orderitems",
+        let: { productIds: "$products._id" },
+        pipeline: [
+          { $match: { $expr: { $in: ["$productId", "$$productIds"] } } },
+          { $group: { _id: null, totalSales: { $sum: "$unitPrice" } } },
+        ],
+        as: "sales",
       },
     },
+    // 3. Add totalSales field
+    {
+      $addFields: {
+        totalSales: {
+          $ifNull: [{ $arrayElemAt: ["$sales.totalSales", 0] }, 0],
+        },
+      },
+    },
+    // 4. Project final fields
     {
       $project: {
-        name: "$_id",
-        value: 1,
         _id: 0,
+        name: "$category",
+        value: "$totalSales",
       },
     },
+    // 5. Sort by totalSales descending
+    { $sort: { value: -1 } },
+    // 6. Limit to top 5
+    { $limit: 5 },
   ]);
 
   return {
@@ -470,11 +515,11 @@ const orderDetails = async (req) => {
 
   // const products =  await getProducts(orderDetails.items)
 
-  const orderInformation = await Order.find({ orderId: orderId })
+  const orderInformation = await Order.find({ orderId: orderId });
 
   return {
     orderDetails,
-    orderInformation
+    orderInformation,
   };
 };
 
