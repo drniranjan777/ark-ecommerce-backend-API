@@ -87,7 +87,10 @@ const getUserWishlistItems = async(req) => {
 
    const wishlist = await Wishlist.findOne({userId:user.id})
 
-   if(!wishlist) throw new AppError('Wishlist not found',404)
+   if(!wishlist){
+     await Wishlist.create({ userId: user.id })
+     return
+   }
 
    const wishlistItems = await WishlistItem.find({wishlistId:wishlist._id}).populate('productId').lean()
 
