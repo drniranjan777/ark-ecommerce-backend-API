@@ -206,7 +206,6 @@ const sendOtp = async(req) => {
   if(!user) {
      user = await User.create({
       mobileNumber:mobileNumber,
-      email:undefined
      })
   }
 
