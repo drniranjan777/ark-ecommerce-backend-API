@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema(
   {
-    email: { type: String, unique: true,sparse: true },
-    password: { type: String },
+    email: { type: String,trim:true},
+    password: { type: String,trim:true },
     name:{type:String,},
-    mobileNumber:{type:Number,unique: true,sparse: true},
+    mobileNumber:{type:Number},
     status: {
       type: String,
       enum: ['active', 'block'],  
