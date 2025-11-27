@@ -85,12 +85,9 @@ const clearWishlist = async(req) => {
 const getUserWishlistItems = async(req) => { 
    const user = req.user
 
-   const wishlist = await Wishlist.findOne({userId:user.id})
+   let wishlist = await Wishlist.findOne({userId:user.id})
 
-   if(!wishlist){
-     await Wishlist.create({ userId: user.id })
-     return
-   }
+   if(!wishlist) wishlist = await Wishlist.create({ userId: user.id })
 
    const wishlistItems = await WishlistItem.find({wishlistId:wishlist._id}).populate('productId').lean()
 
