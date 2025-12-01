@@ -12,6 +12,7 @@ const {
 } = require("../utils/payment");
 const transporter = require("../config/mailer");
 
+
 //get products
 const getProducts = async (orderItems) => {
   const productsIds = orderItems.map((item) => item.productId);
@@ -234,7 +235,7 @@ const verifyPayment = async (req) => {
 const getUserOrders = async (req) => {
   const user = req.user;
 
-  const userOrders = await Order.find({ userId: user.id });
+  const userOrders = await Order.find({ userId: user.id }).sort({ createdAt: -1 }).lean();
 
   if (!userOrders) throw new AppError("Orders not found", 404);
 
@@ -282,7 +283,7 @@ const getAllOrders = async (req) => {
   if (name) filter.name = { $regex: name, $options: "i" };
   if (status) filter.status = status;
 
-  const orders = await Order.find(filter).skip(skip).limit(limit).lean();
+  const orders = await Order.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 }).lean();
 
   // const finalOrderswithProducts = await Promise.all(
   //     orders.map(async(order) => {
@@ -560,7 +561,7 @@ const updateRefundStatus = async (req) => {
 //get cancelled products
 const getOrderProductsByStatus = async (req) => {
   const { status } = req.body;
-  const items = await OrderItem.find({ status: status }).populate("productId");
+  const items = await OrderItem.find({ status: status }).populate("productId").sort({ createdAt: -1 });
   return items;
 };
 

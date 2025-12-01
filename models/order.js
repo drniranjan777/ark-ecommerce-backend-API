@@ -1,14 +1,13 @@
 const mongoose = require('mongoose');
 const Product = require('../models/product')
-const { v4: uuidv4 } = require("uuid");
-
+const generateOrderNumber = require('../utils/orderId')
 
 const orderSchema = new mongoose.Schema({
   orderId: {
     type: String,
     unique: true,
     required: true,
-    default: () => `ORD-${uuidv4()}`, // Auto-generate unique order ID
+    default: () => generateOrderNumber()
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
