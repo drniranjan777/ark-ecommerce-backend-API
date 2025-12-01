@@ -22,7 +22,13 @@ const getProductByid = async(req) => {
     if(!product){
       throw new AppError("Product not found",404)
     }
-    return product
+
+    const relatedProducts = await Product.find({category:product.category})
+
+    return {
+      product,
+      relatedProducts
+    }
 }
 
 
