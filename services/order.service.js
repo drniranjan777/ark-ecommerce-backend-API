@@ -9,6 +9,7 @@ const Category = require("../models/category");
 const {
   createRazorpayOrder,
   verifyRazorpaySignature,
+  refundPayment
 } = require("../utils/payment");
 const transporter = require("../config/mailer");
 
@@ -224,6 +225,14 @@ const verifyPayment = async (req) => {
     { $set: { status: "confirmed", paymentStatus: "paid" } },
     { new: true }
   );
+
+  const orderItem = await OrderItem.findOne({orderId:checkPaymentOrder.orderId})
+
+  if(!orderItem) throw new AppError('Order item not found',404)
+
+  orderItem.paymentId =  razorpayPaymentId
+
+  await orderItem.save()
 
   req.session.buyNow = null;
   await CartItem.deleteMany({ cartId: cart._id });
@@ -529,11 +538,27 @@ const orderDetails = async (req) => {
 const updateOrderItemStatus = async (req) => {
   const { orderId, productId, status } = req.body;
 
-  const result = await OrderItem.updateOne(
-    { orderId, productId },
-    { $set: { status: status } },
-    { new: true, runValidators: true }
-  );
+  const orderItem = await OrderItem.findOne({ orderId, productId })
+
+  if (status === "returned") {
+    const createdAt = orderItem.createdAt;
+    const now = new Date();
+    const diffInMs = now - createdAt;
+    const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+
+    if (diffInDays > 7) {
+      throw new AppError("Return period expired. Cannot return this product.", 400);
+    }
+  }
+
+  // const result = await OrderItem.updateOne(
+  //   { orderId, productId },
+  //   { $set: { status: status } },
+  //   { new: true, runValidators: true }
+  // );
+
+  orderItem.status = status;
+  await orderItem.save();
 
   if (result.matchedCount === 0) throw new AppError("Product not found", 404);
   if (result.modifiedCount === 0) throw new AppError("No changes made", 400);
@@ -545,6 +570,16 @@ const updateOrderItemStatus = async (req) => {
 
 const updateRefundStatus = async (req) => {
   const { orderId, productId, refundStatus } = req.body;
+
+  const orderItem = await OrderItem.updateOne(
+    { orderId, productId },
+  );
+
+  const refund = await refundPayment(orderItem.paymentId,orderItem.unitPrice)
+
+  if (refund.status !== "processed") {
+    return new AppError('Refund failed',400)
+  }
 
   const result = await OrderItem.updateOne(
     { orderId, productId },

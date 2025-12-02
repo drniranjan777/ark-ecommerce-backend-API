@@ -64,8 +64,16 @@ function verifyRazorpaySignature({
   return digest === razorpay_signature;
 }
 
+//refund amount
+
+const refundPayment = async(paymentId,amount) => {
+   const refund = await razorpayClient.payments.refund(paymentId, { amount })
+   return refund
+}
+
 module.exports = {
   razorpayClient,
   createRazorpayOrder,
   verifyRazorpaySignature,
+  refundPayment
 };

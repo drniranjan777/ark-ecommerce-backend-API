@@ -27,6 +27,9 @@ const orderItemSchema = new mongoose.Schema({
   appliedCoupon:{
     type:String
   },
+  paymentId:{
+     type:String
+  },
   createdAt: { type: Date, default: Date.now }
 });
 
